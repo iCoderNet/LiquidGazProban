@@ -1,0 +1,52 @@
+[
+    {
+        "name": "token",
+        "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJheml6YmVrc2FkaXFvdiIsInJvbGUiOiJVU0VSIiwicGVybWlzc2lvbnMiOlsiVVNFUl9SRUFEIiwiVVNFUl9TVEFUSVNUSUNTIiwiVVNFUl9XUklURSJdLCJhdXRoZW50aWNhdGlvblR5cGUiOiJMT0dJTiIsImp0aSI6Njk1MTE1NjY3NTE1MTE5NDY4LCJzZXNzaW9uIjo3ODA2MDUxNzE3ODEyMjg2MjIsImhhc0xlZ2FsIjpmYWxzZSwiZW5hYmxlZFR3b0ZhY3RvckF1dGgiOmZhbHNlLCJjb25maXJtZWRXaXRoUGtjcyI6ZmFsc2UsImNvbmZpcm1lZFdpdGhNb2JpbGVJZCI6ZmFsc2UsImlhdCI6MTc2Mzk0NzU3NSwiZXhwIjoxNzYzOTU0Nzc1fQ.V2IpM2QTucIgN4JUJj315_3l7RleLa5DZeHyN-fHPfQ1td5j9sZPXuZXsmUmqCdLfG36laJ-6-wVUvSiGPkPlw",
+        "domain": "id.egov.uz",
+        "path": "/",
+        "expires": 1763954770,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "Strict"
+    },
+    {
+        "name": "confirmedWithPkcs",
+        "value": "false",
+        "domain": "id.egov.uz",
+        "path": "/",
+        "expires": 1763954770,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "Strict"
+    },
+    {
+        "name": "confirmedWithMobileId",
+        "value": "false",
+        "domain": "id.egov.uz",
+        "path": "/",
+        "expires": 1763954770,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "Strict"
+    },
+    {
+        "name": "XSRF-TOKEN",
+        "value": "eyJpdiI6IjA5alNId2QrbVY5eUk1dTlMZnRoMUE9PSIsInZhbHVlIjoib2NvcHVMUHB3NDJCUGdINmhkQlAzQlpMdERRd2wrQU9DeEswb1h0cklrdkpSZEVWRExFc0pcL0ZsdGk3YkZyV1QiLCJtYWMiOiI1ODEyY2FlNzg5MDliZjI5ZjQ1NTZjYWM2MjVkMmU5YWZlNmRjYWU3ODA2MWVkOTE3Mzk2NjNmMDk3Nzk3OWYyIn0%3D",
+        "domain": "egaz.uz",
+        "path": "/",
+        "expires": 1763954779.476836,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+    },
+    {
+        "name": "e_gaz_billing_session",
+        "value": "eyJpdiI6InJoNG5wSDBGWW9IczErXC9qRlFFaUp3PT0iLCJ2YWx1ZSI6ImtxS2Y1ZjA2V1FtcGhGTUg3aXd2eGlrYVp2VnU3MHRcL0NKYURqN0dMSllKeU42NGpWemxOVm9RRnNsbXFTSTB5b2JTTk5KWXhVWGRcLzIwRVwvcGJ4dDRLa3FTN1ZaSWJNUHEyQk8yenVscHBGNVo5Q3U3M01iV3BsRE5CdXJGS3c1IiwibWFjIjoiODFiNTQ1MDhkMDUxNzJlY2MyYmE4MjJjNTkwMTMyMTNjNzk3MWU4OTRmYWQ4ZWQ3YTllZTYyZWMxMTI4Y2YyMiJ9",
+        "domain": "egaz.uz",
+        "path": "/",
+        "expires": 1763954779.477004,
+        "httpOnly": true,
+        "secure": false,
+        "sameSite": "Lax"
+    }
+]

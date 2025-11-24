@@ -1,6 +1,7 @@
 import requests
 import time
 from typing import Optional, Dict, Any
+import os
 
 
 class EgazAPI:
@@ -375,6 +376,103 @@ class EgazAPI:
         response.raise_for_status()
         
         return response.json()
+    def _get_multipart_headers(self) -> Dict[str, str]:
+        """
+        Get headers for multipart form data requests (without Content-Type).
+        
+        Returns:
+            Dict containing HTTP headers
+        """
+        headers = self._get_headers()
+        # Remove Content-Type as it will be set automatically by requests library
+        del headers['Content-Type']
+        return headers
+    
+    def submit_ballon_request(
+        self,
+        oper: str,
+        id_rgs: int,
+        id_request: int,
+        ballon_kod: str,
+        next_rdt: int,
+        auth_sh:str,
+        abonent_kod: str,
+        location_lon: float,
+        location_lat: float,
+        abon_pinfl: str,
+        photo_path: str,
+        ballon_hash: Optional[str] = None,
+        others: Optional[str] = None,
+        abon_relation_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Submit a balloon request with photo.
+        
+        Args:
+            oper: Operation type (e.g., "realization")
+            id_rgs: RGS ID
+            id_request: Request ID
+            ballon_kod: Balloon code (17 digits)
+            next_rdt: Next RDT value
+            abonent_kod: Abonent code (11 digits)
+            location_lon: Longitude coordinate
+            location_lat: Latitude coordinate
+            abon_pinfl: Abonent PINFL (14 digits)
+            photo_path: Path to the photo file (JPEG)
+            ballon_hash: Optional balloon hash
+            others: Optional other data
+            abon_relation_id: Optional abonent relation ID
+        
+        Returns:
+            API response as dictionary
+        
+        Raises:
+            requests.exceptions.RequestException: If request fails
+            FileNotFoundError: If photo file doesn't exist
+            ValueError: If user is not logged in
+        """
+        # Check if user is logged in
+        if not self.user_id or not self.auth_hash:
+            raise ValueError("User must be logged in first. Call login() method.")
+        
+        # Check if photo file exists
+        if not os.path.exists(photo_path):
+            raise FileNotFoundError(f"Photo file not found: {photo_path}")
+        
+        # Prepare multipart form data
+        files = {
+            'oper': (None, oper),
+            'id_rgs': (None, str(id_rgs)),
+            'auth_hash': (None, self.auth_hash),
+            'id_user': (None, str(self.user_id)),
+            'id_request': (None, str(id_request)),
+            'ballon_kod': (None, ballon_kod),
+            'ballon_hash': (None, ballon_hash if ballon_hash else 'null'),
+            'next_rdt': (None, str(next_rdt)),
+            'abonent_kod': (None, abonent_kod),
+            'others': (None, others if others else 'null'),
+            'abon_relation_id': (None, abon_relation_id if abon_relation_id else ''),
+            'location_lon': (None, str(location_lon)),
+            'location_lat': (None, str(location_lat)),
+            'abon_pinfl': (None, abon_pinfl),
+            'photo': (os.path.basename(photo_path), open(photo_path, 'rb'), 'image/jpeg')
+        }
+        
+        try:
+            response = requests.post(
+                f'{self.BASE_URL}/ballon_requests_rgs',
+                files=files,
+                headers=self._get_multipart_headers(),
+                timeout=30
+            )
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise requests.exceptions.RequestException(f"Failed to submit balloon request: {e}")
+        finally:
+            # Close the file handle
+            if 'photo' in files and hasattr(files['photo'][1], 'close'):
+                files['photo'][1].close()
 
 
 # Example usage
