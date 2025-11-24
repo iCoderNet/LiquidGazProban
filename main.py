@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from  api.inspector_login import EgazAPI
 from bot import EGazBot
-from profile import DashboardApp
+from dashboard import DashboardApp
 import xtokens
 Eapi=''
 Ebot=''
@@ -124,7 +124,9 @@ class LoginApp:
             EgazAPI=Eapi
             EGazBot=Ebot
             Prf=DashboardApp(root,lgn['data'],Eapi,EGazBot)
-            Prf.auth_hash=xtokens.make_hash(login,str(lgn['data']['id']),xtokens.timestamp)
+            auth_hash = xtokens.make_hash(login,str(lgn['data']['id']),xtokens.timestamp)
+            Prf.auth_hash = auth_hash
+            Eapi.auth_hash = auth_hash
             
              
             

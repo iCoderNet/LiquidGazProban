@@ -395,7 +395,6 @@ class EgazAPI:
         id_request: int,
         ballon_kod: str,
         next_rdt: int,
-        auth_sh:str,
         abonent_kod: str,
         location_lon: float,
         location_lat: float,

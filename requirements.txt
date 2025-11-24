@@ -1,0 +1,19 @@
+# Required packages for LiquidGazProban
+
+# Core dependencies
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# Browser automation
+playwright>=1.40.0
+
+# GUI
+# tkinter is built-in with Python, no need to install
+
+# Optional but recommended
+python-dotenv>=1.0.0
+
+# Development dependencies (optional)
+# black>=23.0.0  # Code formatting
+# pylint>=3.0.0  # Linting
