@@ -46,7 +46,7 @@ def generate_path(start_lat, start_lng, stop_lat, stop_lng, steps):
 import requests
 
 def get_pic_url(seria, db):
-    url = "https://cp.bot-dev.uz/get-passport-info/"   # Lokaldagi server
+    url = "http://176.96.243.106:8000/get-passport-info"   # Lokaldagi server
     payload = {
         "passport": seria,
         "date_birthday": db,
@@ -54,11 +54,11 @@ def get_pic_url(seria, db):
     }
 
     try:
-        resp = requests.post(url, json=payload, timeout=10)
+        resp = requests.post(url, json=payload,timeout=60)
         resp.raise_for_status()   # HTTP xatolarni ushlash
         data = resp.json()
         print("Server javobi:", data)
-        return data
+        return f"https://api.5tashabbus.uz/FileManage/Get?id={data['result']['photo']['attachmentfileid']}"
 
     except requests.exceptions.RequestException as e:
         print("So‘rov xatosi:", e)
