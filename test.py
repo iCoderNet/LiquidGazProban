@@ -1,32 +1,39 @@
-# pip install beautifulsoup4 lxml
-from bs4 import BeautifulSoup
+import bot
+import func
 
-def extract_td_a(html, encoding="utf-8"):
-    """
-    index.html faylidan <td><a>...</a></td> elementlarini topib
-    list of dict qaytaradi: [{"href":..., "text":..., "attrs": {...}}, ...]
-    """
-    html = html.encode(encoding) if isinstance(html, str) else html
+# Initialize bot
+Ebot = bot.EGazBot()
 
-    # parser sifatida 'lxml' yoki 'html.parser' ishlatish mumkin
-    soup = BeautifulSoup(html, "lxml")
+# Test request ID
+request_id = '1270896'
 
-    # CSS selector orqali: faqat td ichidagi to'g'ridan-to'g'ri <a> lar
-    anchors = soup.select("td > a")
+print(f"Testing with Request ID: {request_id}")
+print("=" * 50)
 
-    results = []
-    for a in anchors:
-        href = a.get("href", "")
-        text = a.get_text(strip=True).replace('✅','')
-        jsn=dict()
-        attrs = dict(a.attrs)
-        if not text in ['❌','✅', ''] and text.startswith('8800') :
-            jsn['balon_id'] = text
-        if text.startswith('01'):
-            jsn['kod'] = text
-        results.append(jsn)
+# Get HTML from get_detail
+html = Ebot.get_detail(request_id)
 
-    return results
-tana=extract_td_a
+# Extract unsold balloons
+result = func.extract_td_a(html, kod="00000000371")
 
+print(f"\nResults:")
+print(f"  Unsold balloons: {len(result['balon_id'])}")
+print(f"  Users without purchases: {len(result['codes'])}")
 
+if result['balon_id']:
+    print(f"\n  First 5 unsold balloons:")
+    for i, balloon in enumerate(result['balon_id'][:5], 1):
+        print(f"    {i}. {balloon}")
+    
+    if len(result['balon_id']) > 5:
+        print(f"    ... and {len(result['balon_id']) - 5} more")
+
+if result['codes']:
+    print(f"\n  First 5 users without purchases:")
+    for i, code in enumerate(result['codes'][:5], 1):
+        print(f"    {i}. {code}")
+    
+    if len(result['codes']) > 5:
+        print(f"    ... and {len(result['codes']) - 5} more")
+
+print(f"\n[OK] Test completed successfully!")

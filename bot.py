@@ -235,19 +235,6 @@ class EGazBot:
                         result['jshshir'] = jshshir_tag[:nind] if nind > 0 else jshshir_tag
             
             logger.info(f"Successfully parsed subscriber data for {code}")
-        except Exception as e:
-            logger.error(f"Error parsing subscriber details: {e}", exc_info=True)
-        
-        # Last payment
-        try:
-            payment_tag = soup.find("b", string=re.compile("Последний платеж|Охирги тўлов", re.I))
-            if payment_tag and payment_tag.next_sibling:
-                result["last_payment"] = payment_tag.next_sibling.strip()
-        except Exception as e:
-            logger.debug(f"Could not extract last payment: {e}")
-
-        # Gas cylinders table
-        try:
             table = soup.find("table")
             if table:
                 rows = table.find_all("tr")[1:]  # Skip header

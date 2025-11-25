@@ -186,10 +186,12 @@ class DashboardApp:
             )
             # print(chk)
             blns=self.Eapi.ballon_requests_rgs(oper='list',id_rgs=self.id_org,auth_hash=self.auth_hash,take=100) 
-            root=tk.Tk()
-            OrdersWindow(root, blns['data'],Eapi=self.Eapi,insname=chk['data']['name'],EgazBot=self.EgazBot,kod=self.inspector_kod)
             
-            self.root.destroy()
+            # Clear current window
+            for widget in self.root.winfo_children():
+                widget.destroy()
+                
+            OrdersWindow(self.root, blns['data'],Eapi=self.Eapi,insname=chk['data']['name'],EgazBot=self.EgazBot,kod=self.inspector_kod)
             
             
         
@@ -200,25 +202,3 @@ class DashboardApp:
         result = messagebox.askyesno("Chiqish", "Tizimdan chiqmoqchimisiz?")
         if result:
             self.root.destroy()
-
-# Test uchun (asl dasturda bu login oynasidan keladi)
-# if __name__ == "__main__":
-#     # API dan kelgan ma'lumotlar
-#     test_user_data = {
-#         'id': 5975696,
-#         'email': '01124000104@hgt.uz',
-#         'kod': '01124000104',
-#         'lastlogin': '2025-11-24 01:25:00',
-#         'name': 'MADAMINOV BOBIRJON MIRZAJON О\'G\'LI',
-#         'id_region': 1,
-#         'id_district': 4,
-#         'id_org': 122,
-#         'org_name': 'Асака туман ГАЗ',
-#         'privileges_id': 3,
-#         'privileges_name': 'Инспектор Райгаз',
-#         'status': 'Active'
-#     }
-    
-#     root = tk.Tk()
-#     app = DashboardApp(root, test_user_data)
-#     root.mainloop()

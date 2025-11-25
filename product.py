@@ -277,63 +277,10 @@ class OrdersWindow:
         order_num = order.get('numb', 'N/A')
         order_qty = order.get('accepted_qty', 0)
         # print(order)    
-        root = tk.Tk()
+        
+        # Clear current window
+        for widget in self.root.winfo_children():
+            widget.destroy()
+            
         # print(order)
-        SellWindow(root, order, self.Eapi,self.EgazBot,self.kod,order['id'])
-        self.root.destroy()
-        
-        
-
-# # Test uchun
-# if __name__ == "__main__":
-#     # API dan kelgan ma'lumotlar (namuna)
-#     test_orders = [
-#         {
-#             'id': 1269205,
-#             'numb': 3190082,
-#             'dt_creation': '2025-11-23',
-#             'gns_name': 'Ширин газ сервис МЧЖ ГТС',
-#             'rgs_name': 'Асака туман ГАЗ',
-#             'amount': '4720000.00',
-#             'accepted_qty': 118,
-#             'passed_qty': 0,
-#             'returned_qty': 0,
-#             'created_by': 'Рахимова Одина Акрамхуджаевна',
-#             'accepted_by': "Alijonov Bexruzbek Axlidin o'g'li",
-#             'dt_acception': '2025-11-23 10:18:31'
-#         },
-#         {
-#             'id': 1269233,
-#             'numb': 3190110,
-#             'dt_creation': '2025-11-23',
-#             'gns_name': 'Ширин газ сервис МЧЖ ГТС',
-#             'rgs_name': 'Асака туман ГАЗ',
-#             'amount': '4720000.00',
-#             'accepted_qty': 118,
-#             'passed_qty': 1,
-#             'returned_qty': 0,
-#             'created_by': 'Рахимова Одина Акрамхуджаевна',
-#             'accepted_by': 'MADAMINOV BOBIRJON MIRZAJON О\'G\'LI',
-#             'dt_acception': '2025-11-23 11:14:18'
-#         },
-#         {
-#             'id': 1268485,
-#             'numb': 3189362,
-#             'dt_creation': '2025-11-22',
-#             'gns_name': 'Ширин газ сервис МЧЖ ГТС',
-#             'rgs_name': 'Асака туман ГАЗ',
-#             'amount': '4720000.00',
-#             'accepted_qty': 118,
-#             'passed_qty': 0,
-#             'returned_qty': 0,
-#             'created_by': 'Рахимова Одина Акрамхуджаевна',
-#             'accepted_by': 'QURBONOV SHAROBIDDIN',
-#             'dt_acception': '2025-11-22 09:18:04'
-#         }
-#     ]
-    
-#     test_insname = "MADAMINOV BOBIRJON MIRZAJON О'G'LI"
-    
-#     root = tk.Tk()
-#     app = OrdersWindow(root, test_orders, None, test_insname)
-#     root.mainloop()
+        SellWindow(self.root, order, self.Eapi,self.EgazBot,self.kod,order['id'])

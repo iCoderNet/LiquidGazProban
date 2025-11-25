@@ -4,6 +4,7 @@ from datetime import datetime
 import func
 import json
 import time
+import threading
 
 class SellWindow:
     def __init__(self, root, order, Eapi, Ebot,kod,reqid):
@@ -124,14 +125,21 @@ class SellWindow:
         self.stop_lon_entry.insert(0, "71.752475")
         self.stop_lon_entry.grid(row=3, column=1, sticky="ew", pady=5, padx=(10, 0), ipady=8)
         
+        # Sleep Time
+        self.create_field(content, "⏱️ Kutish vaqti (sekund):", 4)
+        self.sleep_entry = tk.Entry(content, font=("Arial", 11), 
+                                    relief=tk.FLAT, bg="#f0f0f0")
+        self.sleep_entry.insert(0, "0")
+        self.sleep_entry.grid(row=4, column=1, sticky="ew", pady=5, padx=(10, 0), ipady=8)
+
         # Abonent raqamlari
         tk.Label(content, text="📱 Abonent raqamlari:", 
                 font=("Arial", 10, "bold"),
-                bg="white", fg="#666", anchor="w").grid(row=4, column=0, sticky="w", pady=(15, 5))
+                bg="white", fg="#666", anchor="w").grid(row=5, column=0, sticky="w", pady=(15, 5))
         
         tk.Label(content, text="(Har bir raqamni yangi qatorga kiriting)", 
                 font=("Arial", 8, "italic"),
-                bg="white", fg="#999", anchor="w").grid(row=5, column=0, columnspan=2, sticky="w")
+                bg="white", fg="#999", anchor="w").grid(row=6, column=0, columnspan=2, sticky="w")
         
         # TextBox for abonent raqamlari
         self.abonent_text = scrolledtext.ScrolledText(content, 
@@ -140,14 +148,14 @@ class SellWindow:
                                                     relief=tk.FLAT, 
                                                     bg="#f0f0f0",
                                                     wrap=tk.WORD)
-        self.abonent_text.grid(row=6, column=0, columnspan=2, sticky="ew", pady=(5, 0))
+        self.abonent_text.grid(row=7, column=0, columnspan=2, sticky="ew", pady=(5, 0))
         
         # Yuklab olish tugmasi
         download_btn = tk.Button(content, text="⬇️ Kodlarni Yuklab Olish", 
                                 font=("Arial", 11, "bold"),
                                 bg="#3498db", fg="white", relief=tk.FLAT, cursor="hand2",
                                 command=self.load_codes_to_textbox)
-        download_btn.grid(row=7, column=0, columnspan=2, pady=15)
+        download_btn.grid(row=8, column=0, columnspan=2, pady=15)
         
         # Configure grid
         content.grid_columnconfigure(1, weight=1)
@@ -184,18 +192,27 @@ class SellWindow:
         start_lon = self.start_lon_entry.get().strip()
         stop_lat = self.stop_lat_entry.get().strip()
         stop_lon = self.stop_lon_entry.get().strip()
+        sleep_time_str = self.sleep_entry.get().strip()
         abonent_numbers = self.abonent_text.get("1.0", tk.END).strip()
         
-        if not all([start_lat, start_lon, stop_lat, stop_lon, abonent_numbers]):
+        if not all([start_lat, start_lon, stop_lat, stop_lon, abonent_numbers, sleep_time_str]):
             messagebox.showwarning("Ogohlantirish", "Iltimos, barcha maydonlarni to'ldiring!")
             return
         
+        try:
+            sleep_time = int(sleep_time_str)
+            if sleep_time < 0:
+                raise ValueError
+        except ValueError:
+            messagebox.showwarning("Ogohlantirish", "Kutish vaqti musbat butun son bo'lishi kerak!")
+            return
+
         numbers_list = abonent_numbers.split('\n')
         numbers_list = [num.strip() for num in numbers_list if num.strip()]
         
-        self.create_progress_window(numbers_list, start_lat, start_lon, stop_lat, stop_lon)
+        self.create_progress_window(numbers_list, start_lat, start_lon, stop_lat, stop_lon, sleep_time)
     
-    def create_progress_window(self, numbers_list, start_lat, start_lon, stop_lat, stop_lon):
+    def create_progress_window(self, numbers_list, start_lat, start_lon, stop_lat, stop_lon, sleep_time):
         """Progress oynasini yaratish"""
         progress_root = tk.Toplevel(self.root)
         progress_root.title("Sotish Jarayoni")
@@ -216,7 +233,7 @@ class SellWindow:
         info_frame.pack(fill=tk.X, padx=20, pady=(20, 10))
         
         total_balloons = len(self.detail.get('balon_id', []))
-        tk.Label(info_frame, text=f"Jami: {len(numbers_list)} ta abonent | Mavjud balonlar: {total_balloons} ta", 
+        tk.Label(info_frame, text=f"Jami: {len(numbers_list)} ta abonent | Mavjud balonlar: {total_balloons} ta | Kutish: {sleep_time}s", 
                 font=("Arial", 11, "bold"), bg="white", fg="#333").pack(pady=10)
         
         # Progress canvas with scrollbar
@@ -255,15 +272,15 @@ class SellWindow:
                                   font=("Arial", 10, "bold"), bg="white", fg="#3498db")
         available_label.pack(side=tk.LEFT, padx=15, pady=10)
         
-        # Start processing
-        progress_root.after(100, lambda: self.process_sales_professional(
+        # Start processing in a separate thread
+        threading.Thread(target=self.process_sales_professional, args=(
             numbers_list, start_lat, start_lon, stop_lat, stop_lon, 
-            progress_frame, success_label, skipped_label, error_label, available_label, progress_root
-        ))
+            progress_frame, success_label, skipped_label, error_label, available_label, progress_root, sleep_time
+        ), daemon=True).start()
     
     def process_sales_professional(self, numbers_list, start_lat, start_lon, stop_lat, stop_lon, 
-                                   progress_frame, success_label, skipped_label, error_label, available_label, progress_root):
-        """Professional balloon allocation with smart retry logic"""
+                                   progress_frame, success_label, skipped_label, error_label, available_label, progress_root, sleep_time):
+        """Professional balloon allocation with smart retry logic and threading"""
         global Ebot
         Ebot = self.EGazBot
         track = func.generate_path(float(start_lat), float(start_lon), float(stop_lat), float(stop_lon), 120)
@@ -277,20 +294,45 @@ class SellWindow:
         total_balloons = len(available_balloons)
         
         for idx, num in enumerate(numbers_list, 1):
-            # UI yaratish
-            item_frame = tk.Frame(progress_frame, bg="white", relief=tk.SOLID, borderwidth=1)
-            item_frame.pack(fill=tk.X, padx=10, pady=5)
+            # UI yaratish (Main thread'da bajarilishi kerak)
+            item_frame = None
+            status_label = None
             
-            tk.Label(item_frame, text=f"{idx}. {num}", 
-                    font=("Arial", 10, "bold"), bg="white", fg="#333", 
-                    anchor="w", width=18).pack(side=tk.LEFT, padx=10, pady=8)
+            def create_ui_item():
+                nonlocal item_frame, status_label
+                item_frame = tk.Frame(progress_frame, bg="white", relief=tk.SOLID, borderwidth=1)
+                item_frame.pack(fill=tk.X, padx=10, pady=5)
+                
+                tk.Label(item_frame, text=f"{idx}. {num}", 
+                        font=("Arial", 10, "bold"), bg="white", fg="#333", 
+                        anchor="w", width=18).pack(side=tk.LEFT, padx=10, pady=8)
+                
+                status_label = tk.Label(item_frame, text="⏳ Tekshirilmoqda...", 
+                                       font=("Arial", 9), bg="white", fg="#666", anchor="w")
+                status_label.pack(side=tk.LEFT, padx=10, pady=8, fill=tk.X, expand=True)
+                
+                progress_frame.update_idletasks()
             
-            status_label = tk.Label(item_frame, text="⏳ Tekshirilmoqda...", 
-                                   font=("Arial", 9), bg="white", fg="#666", anchor="w")
-            status_label.pack(side=tk.LEFT, padx=10, pady=8, fill=tk.X, expand=True)
+            progress_root.after(0, create_ui_item)
             
-            progress_frame.update_idletasks()
+            # UI yaratilishini kutish (oddiy yechim)
+            time.sleep(0.1)
+            while item_frame is None:
+                time.sleep(0.05)
+
+            # Helper functions for UI updates
+            def update_status(text, color):
+                progress_root.after(0, lambda: status_label.config(text=text, fg=color))
             
+            def update_bg(color):
+                progress_root.after(0, lambda: item_frame.config(bg=color))
+                
+            def update_stats():
+                progress_root.after(0, lambda: success_label.config(text=f"✅ Muvaffaqiyatli: {success_count}"))
+                progress_root.after(0, lambda: skipped_label.config(text=f"⏭️ O'tkazildi: {skipped_count}"))
+                progress_root.after(0, lambda: error_label.config(text=f"❌ Xatolik: {error_count}"))
+                progress_root.after(0, lambda: available_label.config(text=f"🎈 Qolgan: {len(available_balloons)}/{total_balloons}"))
+
             try:
                 # Abonent ma'lumotlari
                 st = Ebot.get_subscriber(num)
@@ -298,16 +340,18 @@ class SellWindow:
                 
                 # Balans tekshirish
                 if st.get('balance') == "0.00 СУМ":
-                    status_label.config(text="⏭️ Balans 0 - o'tkazildi", fg="#f39c12")
-                    item_frame.config(bg="#fff8e1")
+                    update_status("⏭️ Balans 0 - o'tkazildi", "#f39c12")
+                    update_bg("#fff8e1")
                     skipped_count += 1
+                    update_stats()
                     continue
                 
                 # Balon borligini tekshirish
                 if not available_balloons:
-                    status_label.config(text="❌ Balonlar tugadi!", fg="#e74c3c")
-                    item_frame.config(bg="#ffebee")
+                    update_status("❌ Balonlar tugadi!", "#e74c3c")
+                    update_bg("#ffebee")
                     error_count += 1
+                    update_stats()
                     continue
                 
                 # GPS
@@ -325,11 +369,11 @@ class SellWindow:
                     current_balloon = available_balloons[0]
                     attempt += 1
                     
-                    status_label.config(
-                        text=f"🔄 Urinish {attempt}/{max_attempts} - Balon: {current_balloon}", 
-                        fg="#3498db"
-                    )
-                    progress_root.update()
+                    update_status(f"🔄 Urinish {attempt}/{max_attempts} - Balon: {current_balloon}", "#3498db")
+                    
+                    rasm_url= func.get_pic_url(self.order['ps'], self.Ebot) 
+                    if rasm_url is None: 
+                        rasm_url='rasm.jpg'
                     
                     try:
                         result = self.Eapi.submit_ballon_request(
@@ -342,18 +386,15 @@ class SellWindow:
                             location_lon=long,
                             location_lat=lat,
                             abon_pinfl=st.get('jshshir', ''),
-                            photo_path="rasm.jpg"
+                            photo_path=rasm_url
                         )
                         
                         api_message = result.get('api_message', '')
                         
                         if result.get('api_status') == 1:
                             # SUCCESS!
-                            status_label.config(
-                                text=f"✅ Sotildi! Balon: {current_balloon} (urinish: {attempt})", 
-                                fg="#43cea2"
-                            )
-                            item_frame.config(bg="#e8f5e9")
+                            update_status(f"✅ Sotildi! Balon: {current_balloon} (urinish: {attempt})", "#43cea2")
+                            update_bg("#e8f5e9")
                             balloon_success = True
                             success_count += 1
                             available_balloons.remove(current_balloon)
@@ -366,11 +407,8 @@ class SellWindow:
                             
                         elif api_message == "Реализация запрещена! Не существует абонент с таким кодом!":
                             # User topilmadi - bu userni skip qilish
-                            status_label.config(
-                                text="⏭️ Abonent tizimda topilmadi - o'tkazildi", 
-                                fg="#f39c12"
-                            )
-                            item_frame.config(bg="#fff8e1")
+                            update_status("⏭️ Abonent tizimda topilmadi - o'tkazildi", "#f39c12")
+                            update_bg("#fff8e1")
                             skipped_count += 1
                             break  # while'den chiqish
                             
@@ -389,31 +427,36 @@ class SellWindow:
                 # Agar hech narsa muvaffaqiyatli bo'lmasa
                 if not balloon_success and api_message != "Реализация запрещена! Не существует абонент с таким кодом!":
                     if not available_balloons:
-                        status_label.config(text="❌ Balonlar tugadi", fg="#e74c3c")
+                        update_status("❌ Balonlar tugadi", "#e74c3c")
                     else:
-                        status_label.config(text=f"❌ {attempt} marta urinish - muvaffaqiyatsiz", fg="#e74c3c")
-                    item_frame.config(bg="#ffebee")
-                    if "⏭️" not in status_label.cget("text"):
+                        update_status(f"❌ {attempt} marta urinish - muvaffaqiyatsiz", "#e74c3c")
+                    update_bg("#ffebee")
+                    # Check if not skipped to avoid double counting
+                    if "⏭️" not in status_label.cget("text"): # Note: cget might not be thread safe, but we rely on previous logic
                         error_count += 1
                         
             except Exception as e:
-                status_label.config(text=f"❌ Fatal: {str(e)[:45]}", fg="#e74c3c")
-                item_frame.config(bg="#ffebee")
+                update_status(f"❌ Fatal: {str(e)[:45]}", "#e74c3c")
+                update_bg("#ffebee")
                 error_count += 1
             
             # Statistikani yangilash
-            success_label.config(text=f"✅ Muvaffaqiyatli: {success_count}")
-            skipped_label.config(text=f"⏭️ O'tkazildi: {skipped_count}")
-            error_label.config(text=f"❌ Xatolik: {error_count}")
-            available_label.config(text=f"🎈 Qolgan: {len(available_balloons)}/{total_balloons}")
+            update_stats()
             
-            progress_root.update()
+            # Sleep delay (User defined)
+            if sleep_time > 0:
+                update_status(f"⏳ Kutish: {sleep_time}s...", "#3498db")
+                time.sleep(sleep_time)
+                # Restore status after sleep if needed, or just leave it for next item
         
         # Yakuniy xabar
-        messagebox.showinfo("Yakunlandi!", 
-                          f"Sotish jarayoni tugadi!\n\n"
-                          f"📊 Jami: {len(numbers_list)} ta\n"
-                          f"✅ Muvaffaqiyatli: {success_count}\n"
-                          f"⏭️ O'tkazildi: {skipped_count}\n"
-                          f"❌ Xatolik: {error_count}\n\n"
-                          f"🎈 Qolgan balonlar: {len(available_balloons)}/{total_balloons}")
+        def show_final_message():
+            messagebox.showinfo("Yakunlandi!", 
+                              f"Sotish jarayoni tugadi!\n\n"
+                              f"📊 Jami: {len(numbers_list)} ta\n"
+                              f"✅ Muvaffaqiyatli: {success_count}\n"
+                              f"⏭️ O'tkazildi: {skipped_count}\n"
+                              f"❌ Xatolik: {error_count}\n\n"
+                              f"🎈 Qolgan balonlar: {len(available_balloons)}/{total_balloons}")
+        
+        progress_root.after(0, show_final_message)

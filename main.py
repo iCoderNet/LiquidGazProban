@@ -119,18 +119,22 @@ class LoginApp:
         
         if lgn['api_status']==1:
             messagebox.showinfo("Muvaffaqiyatli", "Kirish muvaffaqiyatli!")
-            root=tk.Tk()
+            
+            # Clear current window
+            for widget in self.root.winfo_children():
+                widget.destroy()
+                
             # print(lgn)
             EgazAPI=Eapi
             EGazBot=Ebot
-            Prf=DashboardApp(root,lgn['data'],Eapi,EGazBot)
+            
+            # Initialize Dashboard with SAME root
+            Prf=DashboardApp(self.root,lgn['data'],Eapi,EGazBot)
+            
             auth_hash = xtokens.make_hash(login,str(lgn['data']['id']),xtokens.timestamp)
             Prf.auth_hash = auth_hash
             Eapi.auth_hash = auth_hash
             
-             
-            
-            self.root.destroy()
         else:
             messagebox.showerror("Xato", "Login yoki parol noto'g'ri.")
             
