@@ -5,6 +5,10 @@ import func
 import json
 import time
 import threading
+from logger import get_logger
+
+# Initialize logger for sales module
+logger = get_logger('sotuv')
 
 class SellWindow:
     def __init__(self, root, order, Eapi, Ebot,kod,reqid):
@@ -19,6 +23,11 @@ class SellWindow:
         self.kod=kod    
         self.detail=func.extract_td_a(self.EGazBot.get_detail(str(order['id'])),self.kod)
         self.reqid=reqid
+        
+        # Log window initialization
+        logger.info(f"🛒 Sotish oynasi ochildi - Buyurtma №{order.get('numb', 'N/A')}")
+        logger.debug(f"Buyurtma tafsilotlari: GTSH={order.get('gns_name')}, Qabul={order.get('accepted_qty')}, Sotilgan={order.get('passed_qty')}")
+        logger.debug(f"Mavjud balonlar: {len(self.detail.get('balon_id', []))} ta, Taklif qilingan abonentlar: {len(self.detail.get('codes', []))} ta")
        
         # Header
         self.create_header()
@@ -188,6 +197,8 @@ class SellWindow:
     
     def start_sale(self):
         """Ma'lumotlarni validatsiya qilib progress oynasini ochish"""
+        logger.info("🚀 Sotish jarayoni boshlandi - Ma'lumotlar validatsiya qilinmoqda")
+        
         start_lat = self.start_lat_entry.get().strip()
         start_lon = self.start_lon_entry.get().strip()
         stop_lat = self.stop_lat_entry.get().strip()
@@ -196,6 +207,7 @@ class SellWindow:
         abonent_numbers = self.abonent_text.get("1.0", tk.END).strip()
         
         if not all([start_lat, start_lon, stop_lat, stop_lon, abonent_numbers, sleep_time_str]):
+            logger.warning("⚠️ Validatsiya xatosi: Ba'zi maydonlar to'ldirilmagan")
             messagebox.showwarning("Ogohlantirish", "Iltimos, barcha maydonlarni to'ldiring!")
             return
         
@@ -204,11 +216,15 @@ class SellWindow:
             if sleep_time < 0:
                 raise ValueError
         except ValueError:
+            logger.warning(f"⚠️ Validatsiya xatosi: Noto'g'ri kutish vaqti - {sleep_time_str}")
             messagebox.showwarning("Ogohlantirish", "Kutish vaqti musbat butun son bo'lishi kerak!")
             return
 
         numbers_list = abonent_numbers.split('\n')
         numbers_list = [num.strip() for num in numbers_list if num.strip()]
+        
+        logger.info(f"✅ Validatsiya muvaffaqiyatli: {len(numbers_list)} ta abonent, kutish vaqti: {sleep_time}s")
+        logger.debug(f"GPS koordinatalar: Start({start_lat}, {start_lon}) -> Stop({stop_lat}, {stop_lon})")
         
         self.create_progress_window(numbers_list, start_lat, start_lon, stop_lat, stop_lon, sleep_time)
     
@@ -281,6 +297,14 @@ class SellWindow:
     def process_sales_professional(self, numbers_list, start_lat, start_lon, stop_lat, stop_lon, 
                                    progress_frame, success_label, skipped_label, error_label, available_label, progress_root, sleep_time):
         """Professional balloon allocation with smart retry logic and threading"""
+        logger.info("="*80)
+        logger.info(f"🎯 SOTISH JARAYONI BOSHLANDI - Buyurtma №{self.order.get('numb', 'N/A')}")
+        logger.info(f"📊 Jami abonentlar: {len(numbers_list)} ta")
+        logger.info(f"🎈 Mavjud balonlar: {len(self.detail.get('balon_id', []))} ta")
+        logger.info(f"⏱️ Kutish vaqti: {sleep_time} sekund")
+        logger.info(f"📍 GPS yo'nalish: ({start_lat}, {start_lon}) -> ({stop_lat}, {stop_lon})")
+        logger.info("="*80)
+        
         global Ebot
         Ebot = self.EGazBot
         track = func.generate_path(float(start_lat), float(start_lon), float(stop_lat), float(stop_lon), 120)
@@ -293,7 +317,12 @@ class SellWindow:
         available_balloons = self.detail.get('balon_id', []).copy()
         total_balloons = len(available_balloons)
         
+        logger.debug(f"Balon pool yaratildi: {available_balloons[:5]}..." if len(available_balloons) > 5 else f"Balon pool: {available_balloons}")
+        
         for idx, num in enumerate(numbers_list, 1):
+            logger.info(f"\n{'─'*60}")
+            logger.info(f"📱 [{idx}/{len(numbers_list)}] Abonent: {num}")
+            
             # UI yaratish (Main thread'da bajarilishi kerak)
             item_frame = None
             status_label = None
@@ -335,11 +364,15 @@ class SellWindow:
 
             try:
                 # Abonent ma'lumotlari
+                logger.debug(f"Abonent ma'lumotlarini olish: {num}")
                 st = Ebot.get_subscriber(num)
                 time.sleep(0.3)
                 
+                logger.debug(f"Abonent ma'lumotlari: Balans={st.get('balance')}, JSHSHIR={st.get('jshshir', 'N/A')}")
+                
                 # Balans tekshirish
                 if st.get('balance') == "0.00 СУМ":
+                    logger.info(f"⏭️ O'tkazildi - Balans 0: {num}")
                     update_status("⏭️ Balans 0 - o'tkazildi", "#f39c12")
                     update_bg("#fff8e1")
                     skipped_count += 1
@@ -348,6 +381,7 @@ class SellWindow:
                 
                 # Balon borligini tekshirish
                 if not available_balloons:
+                    logger.error(f"❌ BALONLAR TUGADI! Qolgan abonentlar: {len(numbers_list) - idx}")
                     update_status("❌ Balonlar tugadi!", "#e74c3c")
                     update_bg("#ffebee")
                     error_count += 1
@@ -364,18 +398,28 @@ class SellWindow:
                 balloon_success = False
                 attempt = 0
                 max_attempts = min(5, len(available_balloons))
+                rasm_url= func.get_pic_url(st['ps'], st['birth_date']) 
+
+                if rasm_url is None: 
+                        rasm_url='rasm.jpg'
+                        logger.error(f"❌ Rasm topilmadi: ")
+                
+                logger.info(f"🔄 Balon berish jarayoni boshlandi - Maksimal urinishlar: {max_attempts}")
                 
                 while not balloon_success and attempt < max_attempts and available_balloons:
                     current_balloon = available_balloons[0]
                     attempt += 1
                     
+                    logger.debug(f"Urinish {attempt}/{max_attempts} - Balon: {current_balloon}")
                     update_status(f"🔄 Urinish {attempt}/{max_attempts} - Balon: {current_balloon}", "#3498db")
+                    print(st)
                     
-                    rasm_url= func.get_pic_url(self.order['ps'], self.Ebot) 
-                    if rasm_url is None: 
-                        rasm_url='rasm.jpg'
+                    
+                    
                     
                     try:
+                        logger.debug(f"API so'rov yuborilmoqda: Abonent={num}, Balon={current_balloon}, GPS=({lat}, {long})")
+                        
                         result = self.Eapi.submit_ballon_request(
                             oper='realization',
                             abonent_kod=num,
@@ -388,11 +432,15 @@ class SellWindow:
                             abon_pinfl=st.get('jshshir', ''),
                             photo_path=rasm_url
                         )
-                        
+
                         api_message = result.get('api_message', '')
+                        api_status = result.get('api_status')
+                        
+                        logger.debug(f"API javobi: status={api_status}, message={api_message}")
                         
                         if result.get('api_status') == 1:
                             # SUCCESS!
+                            logger.info(f"✅ MUVAFFAQIYAT! Abonent: {num}, Balon: {current_balloon}, Urinish: {attempt}")
                             update_status(f"✅ Sotildi! Balon: {current_balloon} (urinish: {attempt})", "#43cea2")
                             update_bg("#e8f5e9")
                             balloon_success = True
@@ -401,12 +449,13 @@ class SellWindow:
                             
                         elif api_message == "Баллон не найден в БД!":
                             # Balon topilmadi - keyingisini sinash
-                            print(f"⚠️ Balon {current_balloon} topilmadi, olib tashlanmoqda...")
+                            logger.warning(f"⚠️ Balon topilmadi: {current_balloon} - Olib tashlanmoqda")
                             available_balloons.remove(current_balloon)
                             time.sleep(0.2)
                             
                         elif api_message == "Реализация запрещена! Не существует абонент с таким кодом!":
                             # User topilmadi - bu userni skip qilish
+                            logger.warning(f"⏭️ Abonent tizimda topilmadi: {num}")
                             update_status("⏭️ Abonent tizimda topilmadi - o'tkazildi", "#f39c12")
                             update_bg("#fff8e1")
                             skipped_count += 1
@@ -414,12 +463,12 @@ class SellWindow:
                             
                         else:
                             # Boshqa xatolik - balonni olib tashlash va davom etish
-                            print(f"⚠️ Xatolik: {api_message}, boshqa balonni sinaymiz...")
+                            logger.warning(f"⚠️ API xatosi: {api_message} - Balon: {current_balloon}")
                             available_balloons.remove(current_balloon)
                             time.sleep(0.2)
                             
                     except Exception as e:
-                        print(f"Exception: {e}")
+                        logger.error(f"❌ Exception yuz berdi: {str(e)}", exc_info=True)
                         if current_balloon in available_balloons:
                             available_balloons.remove(current_balloon)
                         break
@@ -427,8 +476,10 @@ class SellWindow:
                 # Agar hech narsa muvaffaqiyatli bo'lmasa
                 if not balloon_success and api_message != "Реализация запрещена! Не существует абонент с таким кодом!":
                     if not available_balloons:
+                        logger.error(f"❌ Xatolik: Balonlar tugadi - Abonent: {num}")
                         update_status("❌ Balonlar tugadi", "#e74c3c")
                     else:
+                        logger.error(f"❌ Muvaffaqiyatsiz: {attempt} marta urinish - Abonent: {num}")
                         update_status(f"❌ {attempt} marta urinish - muvaffaqiyatsiz", "#e74c3c")
                     update_bg("#ffebee")
                     # Check if not skipped to avoid double counting
@@ -436,6 +487,7 @@ class SellWindow:
                         error_count += 1
                         
             except Exception as e:
+                logger.error(f"❌ FATAL ERROR - Abonent: {num}, Xatolik: {str(e)}", exc_info=True)
                 update_status(f"❌ Fatal: {str(e)[:45]}", "#e74c3c")
                 update_bg("#ffebee")
                 error_count += 1
@@ -443,11 +495,26 @@ class SellWindow:
             # Statistikani yangilash
             update_stats()
             
+            # Oraliq statistika
+            logger.debug(f"Oraliq natija: ✅ {success_count} | ⏭️ {skipped_count} | ❌ {error_count} | 🎈 {len(available_balloons)}")
+            
             # Sleep delay (User defined)
             if sleep_time > 0:
+                logger.debug(f"⏳ Kutish: {sleep_time} sekund")
                 update_status(f"⏳ Kutish: {sleep_time}s...", "#3498db")
                 time.sleep(sleep_time)
                 # Restore status after sleep if needed, or just leave it for next item
+        
+        # Yakuniy statistika
+        logger.info("\n" + "="*80)
+        logger.info("🏁 SOTISH JARAYONI YAKUNLANDI")
+        logger.info(f"📊 Jami abonentlar: {len(numbers_list)} ta")
+        logger.info(f"✅ Muvaffaqiyatli: {success_count} ta ({success_count/len(numbers_list)*100:.1f}%)")
+        logger.info(f"⏭️ O'tkazildi: {skipped_count} ta ({skipped_count/len(numbers_list)*100:.1f}%)")
+        logger.info(f"❌ Xatolik: {error_count} ta ({error_count/len(numbers_list)*100:.1f}%)")
+        logger.info(f"🎈 Ishlatilgan balonlar: {total_balloons - len(available_balloons)}/{total_balloons} ta")
+        logger.info(f"🎈 Qolgan balonlar: {len(available_balloons)} ta")
+        logger.info("="*80 + "\n")
         
         # Yakuniy xabar
         def show_final_message():

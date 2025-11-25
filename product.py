@@ -2,6 +2,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
 from sotuv import SellWindow
+from logger import get_logger
+
+# Initialize logger for product/orders module
+logger = get_logger('product')
 
 class OrdersWindow:
     def __init__(self, root, orders_data, Eapi, insname, EgazBot,kod):
@@ -14,12 +18,18 @@ class OrdersWindow:
         self.EgazBot=EgazBot
         self.insname = insname
         self.kod=kod
+        self.canvas = None  # Canvas reference for cleanup
+        
+        logger.info(f"📦 Buyurtmalar oynasi ochildi - Inspektor: {insname}")
+        logger.debug(f"Jami buyurtmalar: {len(orders_data)} ta")
       
         # Faqat o'z buyurtmalarini filter qilish
         self.filtered_orders = [
             order for order in self.orders_data 
             if order.get('accepted_by', '') == self.insname
         ]
+        
+        logger.info(f"✅ Filtrlangan buyurtmalar: {len(self.filtered_orders)} ta ({insname})")
         
         # Header
         self.create_header()
@@ -64,6 +74,7 @@ class OrdersWindow:
     def create_content(self):
         # Agar buyurtmalar bo'lmasa
         if len(self.filtered_orders) == 0:
+            logger.warning("⚠️ Buyurtmalar topilmadi")
             self.show_empty_message()
             return
         
@@ -72,37 +83,53 @@ class OrdersWindow:
         container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
         # Canvas
-        canvas = tk.Canvas(container, bg="#f5f5f5", highlightthickness=0)
-        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.canvas = tk.Canvas(container, bg="#f5f5f5", highlightthickness=0)
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
         # Scrollbar
-        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+        scrollbar = ttk.Scrollbar(container, orient="vertical", command=self.canvas.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
         # Configure canvas
-        canvas.configure(yscrollcommand=scrollbar.set)
+        self.canvas.configure(yscrollcommand=scrollbar.set)
         
         # Frame inside canvas
-        self.orders_frame = tk.Frame(canvas, bg="#f5f5f5")
-        canvas_window = canvas.create_window((0, 0), window=self.orders_frame, anchor="nw")
+        self.orders_frame = tk.Frame(self.canvas, bg="#f5f5f5")
+        canvas_window = self.canvas.create_window((0, 0), window=self.orders_frame, anchor="nw")
         
         # Update scrollregion when frame size changes
         def configure_scroll_region(event):
-            canvas.configure(scrollregion=canvas.bbox("all"))
+            if self.canvas and self.canvas.winfo_exists():
+                self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         
         self.orders_frame.bind("<Configure>", configure_scroll_region)
         
         # Adjust frame width to canvas width
         def configure_canvas_width(event):
-            canvas.itemconfig(canvas_window, width=event.width)
+            if self.canvas and self.canvas.winfo_exists():
+                self.canvas.itemconfig(canvas_window, width=event.width)
         
-        canvas.bind("<Configure>", configure_canvas_width)
+        self.canvas.bind("<Configure>", configure_canvas_width)
         
-        # Mouse wheel scroll
+        # Mouse wheel scroll - FIXED: Use canvas.bind instead of bind_all
         def on_mousewheel(event):
-            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+            try:
+                # Check if canvas still exists and is valid
+                if self.canvas and self.canvas.winfo_exists():
+                    self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+            except tk.TclError as e:
+                # Canvas was destroyed, log and ignore
+                logger.debug(f"Canvas scroll event ignored (widget destroyed): {e}")
+            except Exception as e:
+                logger.error(f"❌ Scroll error: {e}", exc_info=True)
         
-        canvas.bind_all("<MouseWheel>", on_mousewheel)
+        # Bind to canvas only, not all widgets
+        self.canvas.bind("<MouseWheel>", on_mousewheel)
+        
+        # Cleanup on window destroy
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
+        logger.debug("Canvas va scroll yaratildi")
         
         # Create order cards
         self.create_order_cards()
@@ -270,13 +297,38 @@ class OrdersWindow:
                 font=("Arial", 9), bg="#333", fg="white").pack(pady=8)
     
     def go_back(self):
+        logger.info("⬅ Orqaga qaytish")
+        self.cleanup()
         self.root.destroy()
+    
+    def on_closing(self):
+        """Window yopilganda cleanup"""
+        logger.info("❌ Buyurtmalar oynasi yopilmoqda")
+        self.cleanup()
+        self.root.destroy()
+    
+    def cleanup(self):
+        """Canvas va event handler'larni tozalash"""
+        try:
+            if self.canvas and self.canvas.winfo_exists():
+                # Unbind all events from canvas
+                self.canvas.unbind("<MouseWheel>")
+                self.canvas.unbind("<Configure>")
+                logger.debug("Canvas event bindings tozalandi")
+            self.canvas = None
+        except Exception as e:
+            logger.debug(f"Cleanup error (ignored): {e}")
     
     def sell_order(self, order):
         # Sotish funksiyasi
         order_num = order.get('numb', 'N/A')
         order_qty = order.get('accepted_qty', 0)
-        # print(order)    
+        
+        logger.info(f"🛒 Sotish oynasi ochilmoqda - Buyurtma №{order_num}")
+        logger.debug(f"Buyurtma ma'lumotlari: Qabul={order_qty}, ID={order.get('id')}")
+        
+        # Cleanup before switching windows
+        self.cleanup()    
         
         # Clear current window
         for widget in self.root.winfo_children():

@@ -280,7 +280,7 @@ class EGazBot:
         }
 
         try:
-            response = self.session.get(url, headers=headers, timeout=10)
+            response = self.session.get(url, headers=headers, timeout=60)
 
             # Check for session expiration
             if response.status_code in [301, 302, 303] or "login" in response.url.lower():
