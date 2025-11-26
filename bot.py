@@ -175,6 +175,7 @@ class EGazBot:
             "code": code,
             'ID': '',
             "fio": "Topilmadi",
+            "photo": "",
             "address": "",
             "organization": "",
             "phone": "",
@@ -206,7 +207,20 @@ class EGazBot:
             if h1_titles:
                 for h1 in h1_titles:
                     ind += 1
-                    text = h1.text
+                    text = h1.text.strip()
+                    
+                    if text == 'ФОТО':
+                        try:
+                            photo_td = h1_titles[ind]  # keyingi <td>
+                            img_tag = photo_td.find("img")
+
+                            if img_tag and img_tag.get("src"):
+                                result["photo"] = img_tag.get("src")
+                            else:
+                                result["photo"] = ""
+
+                        except:
+                            result["photo"] = ""
                     
                     if text == 'Ф.И.О':
                         result["fio"] = h1_titles[ind].text

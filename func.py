@@ -49,13 +49,17 @@ def extract_td_a(html, kod, encoding="utf-8"):
                         if balloon_link:
                             balloon_code = balloon_link.text.strip()
                     
-                    # Column 6: Subscriber code
+                    # Column 6: Subscriber code - search all links for subscriber code
                     subscriber_code = ""
-                    subscriber_link = cols[6].find("a")
-                    if subscriber_link:
-                        subscriber_code = subscriber_link.text.strip()
-                        if subscriber_code:  # Agar mavjud bo'lsa - sotib olgan
+                    col6 = cols[6]
+                    links = col6.find_all("a")
+                    for link in links:
+                        text = link.text.strip()
+                        # Abonent kodi raqamlardan iborat va 01 bilan boshlanadi
+                        if text and text.startswith("01") and len(text) >= 10:
+                            subscriber_code = text
                             sold_subscriber_codes.add(subscriber_code)
+                            break
                     
                     # Agar subscriber code bo'sh bo'lsa - balon sotilmagan
                     if not subscriber_code and balloon_code:

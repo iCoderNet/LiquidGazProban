@@ -362,6 +362,7 @@ class SellWindow:
                 progress_root.after(0, lambda: error_label.config(text=f"❌ Xatolik: {error_count}"))
                 progress_root.after(0, lambda: available_label.config(text=f"🎈 Qolgan: {len(available_balloons)}/{total_balloons}"))
 
+            balloon_success = False
             try:
                 # Abonent ma'lumotlari
                 logger.debug(f"Abonent ma'lumotlarini olish: {num}")
@@ -395,14 +396,25 @@ class SellWindow:
                     lat, long = track[-1]
                 
                 # WHILE LOOP - Retry logic bilan balon berish
-                balloon_success = False
                 attempt = 0
                 max_attempts = min(5, len(available_balloons))
-                rasm_url= func.get_pic_url(st['ps'], st['birth_date']) 
+                # rasm_url= func.get_pic_url(st['ps'], st['birth_date']) 
 
-                if rasm_url is None: 
-                        rasm_url='rasm.jpg'
-                        logger.error(f"❌ Rasm topilmadi: ")
+                # if rasm_url is None: 
+                #         rasm_url='rasm.jpg'
+                #         logger.error(f"❌ Rasm topilmadi: ")
+
+                rasm_url='rasm.jpg'
+                if st['photo'] != "":
+                    logger.info(f"🔄 Rasm yuklanmoqda: {st['photo']}")
+                    photo_url = func.download_pic(st['photo'], st['ps'])
+                    if photo_url is None:
+                        logger.error(f"❌ Rasm yuklanmadi: ")
+                    else:
+                        logger.info(f"🔄 Rasm yuklandi: {photo_url}")
+                        rasm_url = photo_url
+
+                logger.info(f"🔄 Rasm URL: {rasm_url}")
                 
                 logger.info(f"🔄 Balon berish jarayoni boshlandi - Maksimal urinishlar: {max_attempts}")
                 
@@ -499,11 +511,12 @@ class SellWindow:
             logger.debug(f"Oraliq natija: ✅ {success_count} | ⏭️ {skipped_count} | ❌ {error_count} | 🎈 {len(available_balloons)}")
             
             # Sleep delay (User defined)
-            if sleep_time > 0:
-                logger.debug(f"⏳ Kutish: {sleep_time} sekund")
-                update_status(f"⏳ Kutish: {sleep_time}s...", "#3498db")
+            if balloon_success and sleep_time > 0:
+                logger.debug(f"⏳ Muvaffaqiyatli sotish - Kutish: {sleep_time} sekund")
+                update_status(f"✅ Sotildi! Kutish: {sleep_time}s...", "#43cea2")
                 time.sleep(sleep_time)
-                # Restore status after sleep if needed, or just leave it for next item
+            elif not balloon_success:
+                logger.debug(f"⏭️ Xatolik/O'tkazish - Sleep o'tkazib yuborildi")
         
         # Yakuniy statistika
         logger.info("\n" + "="*80)

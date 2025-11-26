@@ -1,0 +1,23 @@
+﻿=== TAB_01 ANALYSIS ===
+Total rows in tab_01: 117
+Sold balloons (with subscriber): 0
+Unsold balloons (no subscriber): 117
+
+=== TAB_06 ANALYSIS ===
+tab_06 exists: True
+tab_06 has table: True
+
+Header columns (4):
+python : Traceback (most recent call last):
+At line:1 char:1
++ python test_analysis.py 2>&1 | Out-File -FilePath output.txt -Encodin ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "C:\Users\Banda\Desktop\egaz\LiquidGazProban\test_analysis.py", line 53, in <module>
+    print(f"  Column {i}: {col.text.strip()}")
+  File "C:\Users\Banda\AppData\Local\Programs\Python\Python311\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 12-15: character maps to <undefined>
