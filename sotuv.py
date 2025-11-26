@@ -23,6 +23,7 @@ class SellWindow:
         self.kod=kod    
         self.detail=func.extract_td_a(self.EGazBot.get_detail(str(order['id'])),self.kod)
         self.reqid=reqid
+        self.map_coordinates = None  # Xaritadan olingan koordinatalar
         
         # Log window initialization
         logger.info(f"🛒 Sotish oynasi ochildi - Buyurtma №{order.get('numb', 'N/A')}")
@@ -106,33 +107,33 @@ class SellWindow:
         content = tk.Frame(input_frame, bg="white")
         content.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
-        # Start Latitude
-        self.create_field(content, "📍 Start Latitude:", 0)
-        self.start_lat_entry = tk.Entry(content, font=("Arial", 11), 
+        # Default Latitude
+        self.create_field(content, "📍 Default Latitude:", 0)
+        self.default_lat_entry = tk.Entry(content, font=("Arial", 11), 
                                         relief=tk.FLAT, bg="#f0f0f0")
-        self.start_lat_entry.insert(0, "40.200722")
-        self.start_lat_entry.grid(row=0, column=1, sticky="ew", pady=5, padx=(10, 0), ipady=8)
+        self.default_lat_entry.insert(0, "41.31")
+        self.default_lat_entry.grid(row=0, column=1, sticky="ew", pady=5, padx=(10, 0), ipady=8)
         
-        # Start Longitude
-        self.create_field(content, "📍 Start Longitude:", 1)
-        self.start_lon_entry = tk.Entry(content, font=("Arial", 11), 
+        # Default Longitude
+        self.create_field(content, "📍 Default Longitude:", 1)
+        self.default_lon_entry = tk.Entry(content, font=("Arial", 11), 
                                         relief=tk.FLAT, bg="#f0f0f0")
-        self.start_lon_entry.insert(0, "71.749894")
-        self.start_lon_entry.grid(row=1, column=1, sticky="ew", pady=5, padx=(10, 0), ipady=8)
+        self.default_lon_entry.insert(0, "69.24")
+        self.default_lon_entry.grid(row=1, column=1, sticky="ew", pady=5, padx=(10, 0), ipady=8)
         
-        # Stop Latitude
-        self.create_field(content, "📍 Stop Latitude:", 2)
-        self.stop_lat_entry = tk.Entry(content, font=("Arial", 11), 
-                                    relief=tk.FLAT, bg="#f0f0f0")
-        self.stop_lat_entry.insert(0, "40.202732")
-        self.stop_lat_entry.grid(row=2, column=1, sticky="ew", pady=5, padx=(10, 0), ipady=8)
+        # Map button
+        map_btn = tk.Button(content, text="🗺️ Xaritani Ochish", 
+                           font=("Arial", 12, "bold"),
+                           bg="#667eea", fg="white", relief=tk.FLAT, cursor="hand2",
+                           pady=10,
+                           command=self.open_map_and_get_coordinates)
+        map_btn.grid(row=2, column=0, columnspan=2, pady=(10, 10), sticky="ew")
         
-        # Stop Longitude
-        self.create_field(content, "📍 Stop Longitude:", 3)
-        self.stop_lon_entry = tk.Entry(content, font=("Arial", 11), 
-                                    relief=tk.FLAT, bg="#f0f0f0")
-        self.stop_lon_entry.insert(0, "71.752475")
-        self.stop_lon_entry.grid(row=3, column=1, sticky="ew", pady=5, padx=(10, 0), ipady=8)
+        # Map status label
+        self.map_status_label = tk.Label(content, text="❌ Xarita ma'lumotlari yuklanmagan", 
+                                        font=("Arial", 9, "italic"),
+                                        bg="white", fg="#e74c3c")
+        self.map_status_label.grid(row=3, column=0, columnspan=2, pady=(0, 15))
         
         # Sleep Time
         self.create_field(content, "⏱️ Kutish vaqti (sekund):", 4)
@@ -175,6 +176,120 @@ class SellWindow:
         for code in codes:
             self.abonent_text.insert(tk.END, code + "\n")
     
+    def open_map_and_get_coordinates(self):
+        """Xaritani Playwright orqali ochish va JSON ma'lumotlarni olish"""
+        logger.info("🗺️ Xarita ochilmoqda - Playwright browser boshlandi")
+        
+        try:
+            from playwright.sync_api import sync_playwright
+            
+            logger.debug("Playwright kutubxonasi yuklandi")
+            
+            with sync_playwright() as p:
+                # Browser ochish (headed mode - ko'rinishda)
+                logger.debug("Browser ishga tushirilmoqda (headed mode)...")
+                browser = p.chromium.launch(headless=False)
+                page = browser.new_page()
+                
+                # Xarita sahifasiga o'tish
+                default_lat = self.default_lat_entry.get().strip()
+                default_lon = self.default_lon_entry.get().strip()
+                
+                map_url = "http://127.0.0.1:5000/"
+                if default_lat and default_lon:
+                    map_url = f"http://127.0.0.1:5000/?lat={default_lat}&long={default_lon}"
+                
+                logger.info(f"📍 Xarita sahifasiga o'tilmoqda: {map_url}")
+                page.goto(map_url, timeout=10000)
+                
+                logger.info("⏳ Foydalanuvchi pozitsiyalarni tanlashini kutmoqda...")
+                
+                # JSON redirect'ni kutish
+                # URL o'zgarishini kuzatish
+                json_data = None
+                timeout = 300000  # 5 minut timeout
+                
+                logger.debug("JSON redirect kutilmoqda...")
+                
+                try:
+                    # Wait for navigation to JSON URL
+                    with page.expect_navigation(timeout=timeout) as nav_info:
+                        pass
+                    
+                    # Check if redirected to JSON endpoint
+                    current_url = page.url
+                    logger.info(f"🔄 Redirect aniqlandi: {current_url}")
+                    
+                    if "data_timesnap.json" in current_url or current_url.endswith(".json"):
+                        # JSON sahifani o'qish
+                        logger.debug("JSON ma'lumotlarni o'qish...")
+                        content = page.content()
+                        
+                        # Extract JSON from page (it might be wrapped in <pre> tags)
+                        import json
+                        from bs4 import BeautifulSoup
+                        
+                        soup = BeautifulSoup(content, 'html.parser')
+                        # Try to find JSON in <pre> or <body>
+                        pre_tag = soup.find('pre')
+                        if pre_tag:
+                            json_text = pre_tag.get_text()
+                        else:
+                            # Try getting from body
+                            body_tag = soup.find('body')
+                            json_text = body_tag.get_text() if body_tag else content
+                        
+                        # Parse JSON
+                        json_data = json.loads(json_text.strip())
+                        logger.info(f"✅ JSON ma'lumotlar olindi: {len(json_data)} ta koordinata juftligi")
+                        logger.debug(f"JSON ma'lumot: {json_data[:2]}..." if len(json_data) > 2 else f"JSON ma'lumot: {json_data}")
+                        
+                    else:
+                        logger.warning(f"⚠️ Kutilmagan URL: {current_url}")
+                        messagebox.showwarning("Ogohlantirish", 
+                                             f"Kutilmagan URL: {current_url}\n"
+                                             "JSON fayl kutilgan edi.")
+                        browser.close()
+                        return
+                        
+                except Exception as e:
+                    logger.error(f"❌ Navigation xatosi: {str(e)}")
+                    messagebox.showerror("Xatolik", 
+                                       f"Xarita ma'lumotlarini olishda xatolik:\n{str(e)}\n\n"
+                                       "Iltimos, xaritada pozitsiyalarni tanlab 'Yuborish' tugmasini bosing.")
+                    browser.close()
+                    return
+                
+                # Browser yopish
+                browser.close()
+                logger.info("🔒 Browser yopildi")
+                
+                if json_data:
+                    self.map_coordinates = json_data
+                    # Update status label
+                    self.map_status_label.config(
+                        text=f"✅ {len(json_data)} ta koordinata juftligi yuklandi",
+                        fg="#43cea2"
+                    )
+                    messagebox.showinfo("Muvaffaqiyat", 
+                                      f"Xarita ma'lumotlari muvaffaqiyatli yuklandi!\n"
+                                      f"Koordinata juftliklari: {len(json_data)} ta")
+                else:
+                    logger.warning("⚠️ JSON ma'lumot bo'sh")
+                    messagebox.showwarning("Ogohlantirish", "Ma'lumot topilmadi!")
+                    
+        except ImportError:
+            logger.error("❌ Playwright kutubxonasi topilmadi")
+            messagebox.showerror("Xatolik", 
+                               "Playwright kutubxonasi o'rnatilmagan!\n\n"
+                               "O'rnatish uchun:\n"
+                               "pip install playwright\n"
+                               "playwright install chromium")
+        except Exception as e:
+            logger.error(f"❌ Xarita ochishda xatolik: {str(e)}", exc_info=True)
+            messagebox.showerror("Xatolik", f"Xaritani ochishda xatolik:\n{str(e)}")
+
+    
     def create_field(self, parent, label, row):
         tk.Label(parent, text=label, 
                 font=("Arial", 10, "bold"),
@@ -191,7 +306,6 @@ class SellWindow:
                              activebackground="#38b090",
                              activeforeground="white",
                              relief=tk.FLAT, cursor="hand2",
-                             padx=40, pady=15,
                              command=self.start_sale)
         start_btn.pack()
     
@@ -199,14 +313,17 @@ class SellWindow:
         """Ma'lumotlarni validatsiya qilib progress oynasini ochish"""
         logger.info("🚀 Sotish jarayoni boshlandi - Ma'lumotlar validatsiya qilinmoqda")
         
-        start_lat = self.start_lat_entry.get().strip()
-        start_lon = self.start_lon_entry.get().strip()
-        stop_lat = self.stop_lat_entry.get().strip()
-        stop_lon = self.stop_lon_entry.get().strip()
         sleep_time_str = self.sleep_entry.get().strip()
         abonent_numbers = self.abonent_text.get("1.0", tk.END).strip()
         
-        if not all([start_lat, start_lon, stop_lat, stop_lon, abonent_numbers, sleep_time_str]):
+        # Check if map coordinates are selected
+        if not self.map_coordinates:
+            logger.warning("⚠️ Validatsiya xatosi: Xarita ma'lumotlari tanlanmagan")
+            messagebox.showwarning("Ogohlantirish", 
+                                 "Iltimos, avval 'Xaritani Ochish' tugmasini bosib koordinatalarni tanlang!")
+            return
+        
+        if not all([abonent_numbers, sleep_time_str]):
             logger.warning("⚠️ Validatsiya xatosi: Ba'zi maydonlar to'ldirilmagan")
             messagebox.showwarning("Ogohlantirish", "Iltimos, barcha maydonlarni to'ldiring!")
             return
@@ -224,11 +341,11 @@ class SellWindow:
         numbers_list = [num.strip() for num in numbers_list if num.strip()]
         
         logger.info(f"✅ Validatsiya muvaffaqiyatli: {len(numbers_list)} ta abonent, kutish vaqti: {sleep_time}s")
-        logger.debug(f"GPS koordinatalar: Start({start_lat}, {start_lon}) -> Stop({stop_lat}, {stop_lon})")
+        logger.info(f"📍 Xarita koordinatalari: {len(self.map_coordinates)} ta juftlik")
         
-        self.create_progress_window(numbers_list, start_lat, start_lon, stop_lat, stop_lon, sleep_time)
+        self.create_progress_window(numbers_list, sleep_time)
     
-    def create_progress_window(self, numbers_list, start_lat, start_lon, stop_lat, stop_lon, sleep_time):
+    def create_progress_window(self, numbers_list, sleep_time):
         """Progress oynasini yaratish"""
         progress_root = tk.Toplevel(self.root)
         progress_root.title("Sotish Jarayoni")
@@ -290,11 +407,11 @@ class SellWindow:
         
         # Start processing in a separate thread
         threading.Thread(target=self.process_sales_professional, args=(
-            numbers_list, start_lat, start_lon, stop_lat, stop_lon, 
+            numbers_list, 
             progress_frame, success_label, skipped_label, error_label, available_label, progress_root, sleep_time
         ), daemon=True).start()
     
-    def process_sales_professional(self, numbers_list, start_lat, start_lon, stop_lat, stop_lon, 
+    def process_sales_professional(self, numbers_list, 
                                    progress_frame, success_label, skipped_label, error_label, available_label, progress_root, sleep_time):
         """Professional balloon allocation with smart retry logic and threading"""
         logger.info("="*80)
@@ -302,12 +419,16 @@ class SellWindow:
         logger.info(f"📊 Jami abonentlar: {len(numbers_list)} ta")
         logger.info(f"🎈 Mavjud balonlar: {len(self.detail.get('balon_id', []))} ta")
         logger.info(f"⏱️ Kutish vaqti: {sleep_time} sekund")
-        logger.info(f"📍 GPS yo'nalish: ({start_lat}, {start_lon}) -> ({stop_lat}, {stop_lon})")
         logger.info("="*80)
         
         global Ebot
         Ebot = self.EGazBot
-        track = func.generate_path(float(start_lat), float(start_lon), float(stop_lat), float(stop_lon), len(numbers_list))
+        
+        # Use map coordinates directly
+        track = self.map_coordinates
+        if not track:
+            logger.error("❌ Xarita koordinatalari mavjud emas!")
+            return
         
         success_count = 0
         skipped_count = 0
@@ -391,9 +512,17 @@ class SellWindow:
                 
                 # GPS
                 if idx - 1 < len(track):
-                    lat, long = track[idx-1]
+                    coord_data = track[idx-1]
+                    # JSON format: {"startlat": ..., "startlong": ..., "stoplat": ..., "stoplong": ...}
+                    # We use startlat/startlong for the sale location
+                    lat = float(coord_data.get('startlat', 0))
+                    long = float(coord_data.get('startlong', 0))
                 else:
-                    lat, long = track[-1]
+                    # Fallback to last coordinate if we run out
+                    coord_data = track[-1]
+                    lat = float(coord_data.get('startlat', 0))
+                    long = float(coord_data.get('startlong', 0))
+                logger.info(f" Lat: {lat}, Long: {long}")
                 
                 # WHILE LOOP - Retry logic bilan balon berish
                 attempt = 0
@@ -424,7 +553,7 @@ class SellWindow:
                     
                     logger.debug(f"Urinish {attempt}/{max_attempts} - Balon: {current_balloon}")
                     update_status(f"🔄 Urinish {attempt}/{max_attempts} - Balon: {current_balloon}", "#3498db")
-                    print(st)
+
                     
                     
                     
