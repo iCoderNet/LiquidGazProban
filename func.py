@@ -183,3 +183,27 @@ def get_pic_url(seria, db):
     except Exception as e:
         logger.error(f"❌ Kutilmagan xatolik: {str(e)}", exc_info=True)
         return None
+import requests
+
+def get_pic_url_with_pas(seria, db):
+    url = "http://176.96.243.106:8000/get-passport-info"   # Lokaldagi server
+    payload = {
+        "passport": seria,
+        "date_birthday": db,
+        "max_attempts": 7
+    }
+
+    try:
+        resp = requests.post(url, json=payload, timeout=60)
+        resp.raise_for_status()   # HTTP xatolarni ushlash
+        data = resp.json()
+        print("Server javobi:", data)
+        return data
+
+    except requests.exceptions.RequestException as e:
+        print("So‘rov xatosi:", e)
+        return {"error": str(e)}
+
+    except ValueError:
+        print("JSON format xatosi. Server noto‘g‘ri javob qaytardi.")
+        return {"error": "invalid_json"}

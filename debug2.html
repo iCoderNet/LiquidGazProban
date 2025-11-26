@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>E-GAZ Billing: Детальная информация</title>
+    <meta name="csrf-token" content="XAvcc6BHNa5rnmOgTKN3DGLVcbXinYxK9PT42IdA" />
+    <meta name='generator' content='Umid Khamdamov' />
+    <meta name="description" content="Kabus Web Solutions, Uzbekistan">
+    <meta name="keywords" content="EGAZ,E-GAZ UZB,E-GAS UZBEKISTAN">
+    <link rel="shortcut icon" href="https://egaz.uz/vendor/crudbooster/assets/logo_crudbooster.png">
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <!-- Bootstrap 3.3.2 -->
+    <link href="https://egaz.uz/vendor/crudbooster/assets/adminlte/bootstrap/css/bootstrap.min.css" rel="stylesheet"
+        type="text/css" />
+    <!-- Font Awesome Icons -->
+    <link href="https://egaz.uz/vendor/crudbooster/assets/adminlte/font-awesome/css/font-awesome.min.css"
+        rel="stylesheet" type="text/css" />
+    <!-- Ionicons -->
+    <link href="https://egaz.uz/vendor/crudbooster/ionic/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+    <!-- Theme style -->
+    <link href="https://egaz.uz/vendor/crudbooster/assets/adminlte/dist/css/AdminLTE.min.css" rel="stylesheet"
+        type="text/css" />
+    <link href="https://egaz.uz/vendor/crudbooster/assets/adminlte/dist/css/skins/_all-skins.min.css" rel="stylesheet"
+        type="text/css" />
+    <link href="https://egaz.uz/css/iziToast.min.css" rel="stylesheet" type="text/css" />
+    <!-- <link rel="stylesheet" type="text/css" href="https://egaz.uz/fancybox/jquery.fancybox-1.3.4.css" media="screen" /> -->
+    <!-- support rtl-->
+    <link rel='stylesheet' href='https://egaz.uz/vendor/crudbooster/assets/css/main.css?r=1764144460' />
+    <link rel="stylesheet" href="https://egaz.uz/extra/jqcon.min.css">
+    <link rel="stylesheet" href="https://egaz.uz/extra/leaflet.css">
+    <link rel="stylesheet" href="https://egaz.uz/extra/MarkerCluster.css">
+    <link rel="stylesheet" href="https://egaz.uz/extra/MarkerCluster.Default.css">
+    <link href="https://egaz.uz/extra/leaflet.fullscreen.css" rel="stylesheet" />
+
+    <!-- load css -->
+    <style type="text/css">
+    </style>
+    <style type="text/css">
+        .map {
+            height: 400px;
+        }
+
+        .controls {
+            margin-top: 10px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .pac-container {
+            z-index: 9999999 !important;
+        }
+
+        .pac-input {
+            background-color: #fff;
+            font-family: Roboto;
+            font-size: 15px;
+            font-weight: 300;
+            margin-left: 12px;
+            padding: 0 11px 0 13px;
+            text-overflow: ellipsis;
+            width: 300px;
+        }
+
+        .pac-input:focus {
+            border-color: #4d90fe;
+        }
+
+        .pac-container {
+            font-family: Roboto;
+        }
+
+        .type-selector {
+            color: #fff;
+            background-color: #4d90fe;
+            padding: 5px 11px 0px 11px;
+        }
+
+        .type-selector label {
+            font-family: Roboto;
+            font-size: 13px;
+            font-weight: 300;
+        }
+
+        .ajaxLoading {
+            background: #fff url('/frontend/loading.gif') no-repeat center center;
+            display: none;
+            height: 200px;
+            position: absolute;
+            width: 100%;
+            opacity: 0.5;
+            left: 0;
+            top: 0;
+            height: 100%;
+            z-index: 9999999;
+        }
+
+        @font-face {
+            font-family: "Roboto Condensed";
+            font-style: normal;
+            font-weight: 300;
+            src: local('Roboto Condensed Light'), local('RobotoCondensed-Light'), url("https://egaz.uz/fonts/RobotoCondensed-Light.ttf") format('truetype');
+        }
+
+        @font-face {
+            font-family: "Roboto Condensed";
+            font-style: italic;
+            font-weight: 300;
+            src: local('Roboto Condensed Light Italic'), local('RobotoCondensed-LightItalic'), url("https://egaz.uz/fonts/RobotoCondensed-LightItalic.ttf") format('truetype');
+        }
+
+        /* Normal */
+        @font-face {
+            font-family: "Roboto Condensed";
+            font-style: normal;
+            font-weight: 400;
+            src: local('Roboto Condensed Regular'), local('RobotoCondensed-Regular'), url("https://egaz.uz/fonts/RobotoCondensed-Regular.ttf") format('truetype');
+        }
+
+        @font-face {
+            font-family: "Roboto Condensed";
+            font-style: italic;
+            font-weight: 400;
+            src: local('Roboto Condensed Italic'), local('RobotoCondensed-Italic'), url("https://egaz.uz/fonts/RobotoCondensed-Italic.ttf") format('truetype');
+        }
+
+        /* Bold */
+        @font-face {
+            font-family: "Roboto Condensed";
+            font-style: normal;
+            font-weight: 700;
+            src: local('Roboto Condensed Bold'), local('RobotoCondensed-Bold'), url("https://egaz.uz/fonts/RobotoCondensed-Bold.ttf") format('truetype');
+        }
+
+        @font-face {
+            font-family: "Roboto Condensed";
+            font-style: italic;
+            font-weight: 700;
+            src: local('Roboto Condensed Bold Italic'), local('RobotoCondensed-BoldItalic'), url("https://egaz.uz/fonts/RobotoCondensed-BoldItalic.ttf") format('truetype');
+        }
+
+        table.dataTable span.highlight {
+            background-color: #ffff00;
+        }
+
+        .dropdown-menu-action {
+            left: -130%;
+        }
+
+        .btn-group-action .btn-action {
+            cursor: default
+        }
+
+        #box-header-module {
+            box-shadow: 10px 10px 10px #dddddd;
+        }
+
+        .sub-module-tab li {
+            background: #F9F9F9;
+            cursor: pointer;
+        }
+
+        .sub-module-tab li.active {
+            background: #ffffff;
+            box-shadow: 0px -5px 10px #cccccc
+        }
+
+        .nav-tabs>li.active>a,
+        .nav-tabs>li.active>a:focus,
+        .nav-tabs>li.active>a:hover {
+            border: none;
+        }
+
+        .nav-tabs>li>a {
+            border: none;
+        }
+
+        .breadcrumb {
+            margin: 0 0 0 0;
+            padding: 0 0 0 0;
+        }
+
+        .form-group>label:first-child {
+            display: block
+        }
+
+        .control-label {
+            font-family: "Roboto Condensed";
+            font-weight: 600;
+        }
+
+        .mylable {
+            color: #000;
+            font-weight: 500;
+            font-family: 'Roboto Condensed'
+        }
+
+        .ajaxLoading {
+            background: #fff url(../extra/loading2.gif) no-repeat center center;
+            display: none;
+            height: 200px;
+            position: absolute;
+            width: 100%;
+            opacity: 0.5;
+            left: 0;
+            top: 0;
+            height: 100%;
+            z-index: 9999;
+        }
+
+        table.dataTable.dt-checkboxes-select tbody tr,
+        table.dataTable thead th.dt-checkboxes-select-all,
+        table.dataTable tbody td.dt-checkboxes-cell {
+            cursor: pointer;
+        }
+
+        table.dataTable thead th.dt-checkboxes-select-all,
+        table.dataTable tbody td.dt-checkboxes-cell {
+            text-align: center;
+        }
+
+        div.dataTables_wrapper span.select-info,
+        div.dataTables_wrapper span.select-item {
+            margin-left: 0.5em;
+        }
+
+        @media screen and (max-width: 640px) {
+
+            div.dataTables_wrapper span.select-info,
+            div.dataTables_wrapper span.select-item {
+                margin-left: 0;
+                display: block;
+            }
+        }
+    </style>
+    <script src="https://egaz.uz/js/iziToast.min.js" type="text/javascript"></script>
+    <script src="https://egaz.uz/extra/leaflet.js" type="text/javascript"></script>
+    <script src="https://egaz.uz/extra/leaflet.markercluster.js" type="text/javascript"></script>
+    <script src="https://egaz.uz/extra/Leaflet.fullscreen.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        #table-detail tr td:first-child {
+            font-weight: bold;
+            width: 28%;
+        }
+    </style>
+</head>
+
+<body class="skin-blue ">
+    <div id='app' class="wrapper">
+        <!-- Header -->
+        <!-- Main Header -->
+        <header class="main-header">
+            <!-- Logo -->
+            <a href="https://egaz.uz/admin" title='E-GAZ Billing' class="logo">E-GAZ Billing</a>
+            <!-- Header Navbar -->
+            <nav class="navbar navbar-static-top" role="navigation">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button" title=" /  ">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="label label-primary"
+                        style="font-family: 'Roboto Condensed', 'Arial';font-weight: 400;"></span>
+                </a>
+                <!-- Navbar Right Menu -->
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown notifications-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" title='Письма'
+                                aria-expanded="false">
+                                <i class="fa fa-envelope-o"></i>
+                                <span id='letters_count' class="label label-success" style="display:none">0</span>
+                            </a>
+                            <ul id='list_letters' class="dropdown-menu" style="width:444px!important">
+                                <li class="header" id="header-letters-qty" style="background: #dfdfdf"><i
+                                        class="fa fa-envelope-o"></i> У Вас 0 не прочтенных писем!</li>
+                                <li>
+                                    <ul class="menu"></ul>
+                                </li>
+                                <li class="footer" style="margin:0px">
+                                    <hr style="margin:0px;">
+                                    <h5 class="mylable text-blue text-center"><a
+                                            href="https://egaz.uz/admin/incoming_letters"> <i
+                                                class="fa fa-envelope"></i> Все входящие письма </a></h5>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown notifications-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" title='Уведомления'
+                                aria-expanded="false">
+                                <i id='icon_notification' class="fa fa-bell-o"></i>
+                                <span id='notification_count' class="label label-info" style="display:none">0</span>
+                            </a>
+                            <ul id='list_notifications' class="dropdown-menu" style="width:444px!important;">
+                                <li class="header" id="header-notifies-qty" style="background: #dfdfdf"><i
+                                        class="fa fa-bell-o"></i> У Вас есть 0 не прочтенных уведомлений!</li>
+                                <li>
+                                    <ul class="menu"></ul>
+                                </li>
+                        </li>
+                        <li class="footer" style="margin:0px">
+                            <hr style="margin:0px;">
+                            <h5 class="mylable text-blue text-center"><a href="https://egaz.uz/admin/notifications?m=3">
+                                    <i class="fa fa-bell-o"></i> Все уведомления</a></h5>
+                        </li>
+                    </ul>
+                    </li>
+                    <li class="dropdown notifications-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" title='Задачи' aria-expanded="false">
+                            <i id='icon_tasks' class="fa fa-flag-o"></i>
+                            <span id='tasks_count' class="label label-danger" style="display:none">0</span>
+                        </a>
+                        <ul id='list_tasks' class="dropdown-menu" style="width:444px!important;">
+                            <li class="header" id="header-tasks-qty" style="background: #dfdfdf"><i
+                                    class="fa fa-flag-o"></i> У Вас есть 0 не закрытых задач!</li>
+                            <li>
+                                <ul class="menu"></ul>
+                            </li>
+                            <li class="footer" style="margin:0px">
+                                <hr style="margin:0px;">
+                                <h5 class="mylable text-blue text-center"><a href="https://egaz.uz/admin/piu_tasks"> <i
+                                            class="fa fa-tasks"></i> Все задачи </a></h5>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- User Account Menu -->
+                    <li class="dropdown user user-menu">
+                        <!-- Menu Toggle Button -->
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <!-- The user image in the navbar-->
+                            <img src="https://egaz.uz/uploads/6224123/2024-08/4ef5f72d6f4a71bd329675b645dd6672.jpg"
+                                class="user-image" alt="User Image" />
+                            <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                            <span class="hidden-xs">SADIQOV AZIZBEK AYBEK O‘G‘LI</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <!-- The user image in the menu -->
+                            <li class="user-header">
+                                <img src="https://egaz.uz/uploads/6224123/2024-08/4ef5f72d6f4a71bd329675b645dd6672.jpg"
+                                    class="img-circle" alt="User Image" />
+                                <p>
+                                    SADIQOV AZIZBEK AYBEK O‘G‘LI
+                                    <small>Облгаз оператор</small>
+                                    <small><em>26 November 2025</em> </small>
+                                </p>
+                            </li>
+                            <!-- Menu Footer-->
+                            <li class="user-footer">
+                                <div class="pull-left">
+                                    <a href="https://egaz.uz/admin/users/profile?m=0"
+                                        class="btn btn-default btn-flat"><i class='fa fa-user'></i> Профиль</a>&nbsp;<a
+                                        href="#" class="btn btn-default btn-flat" title="История входов ..."><i
+                                            class="fa fa-history"></i></a>
+                                </div>
+                                <div class="pull-right">
+                                    <a title='Lock Screen' href="https://egaz.uz/admin/lock-screen"
+                                        class='btn btn-default btn-flat'><i class='fa fa-key'></i></a>
+                                    <a href="javascript:void(0)" onclick="swal({   
+                                    title: 'Вы действительно хотите выйти?',                                       
+                                    type:'info',   
+                                    showCancelButton:true, 
+                                    allowOutsideClick:true,  
+                                    confirmButtonColor: '#DD6B55',   
+                                    confirmButtonText: 'Выйти',   
+                                    cancelButtonText: 'Отмена',
+                                    closeOnConfirm: false 
+                                    }, function(){                                                                                 
+                                        location.href = 'https://egaz.uz/admin/logout';
+
+                                    });" title="Выйти" class="btn btn-danger btn-flat"><i
+                                            class='fa fa-power-off'></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    </ul>
+                </div>
+            </nav>
+        </header> <!-- Sidebar -->
+        <!-- Left side column. contains the sidebar -->
+        <aside class="main-sidebar">
+
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
+
+                <!-- Sidebar user panel (optional) -->
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img src="https://egaz.uz/uploads/6224123/2024-08/4ef5f72d6f4a71bd329675b645dd6672.jpg"
+                            class="img-circle" alt="Картинка пользователя" />
+                    </div>
+                    <div class="pull-left info">
+                        <p>SADIQOV AZIZBEK AYBEK O‘G‘LI</p>
+                        <!-- Status -->
+                        <a href="#"><i class="fa fa-circle text-success"></i> В сети</a>
+                    </div>
+                </div>
+
+
+                <div class='main-menu'>
+                    <!-- Sidebar Menu -->
+                    <ul class="sidebar-menu">
+                        <li class="header">Навигация</li>
+                        <!-- Optionally, you can add icons to the links -->
+
+                        <li data-id='' class=""><a href='https://egaz.uz/admin' class=''><i class='fa fa-dashboard'></i>
+                                <span>Дашбоард</span> </a></li>
+
+                        <li data-id='88' class='treeview '>
+                            <a href='#' class='text-normal'>
+                                <i class='fa fa-bar-chart-o text-normal'></i> <span>Статистика</span>
+                                <i class="fa fa-angle-right pull-right"></i> </a>
+                            <ul class="treeview-menu">
+                                <li data-id='89' class=''>
+                                    <a href='https://egaz.uz/admin/dashfinance'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-money'></i> <span>Поступление</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                        <li data-id='104' class='treeview '>
+                            <a href='https://egaz.uz/admin/heavy_residue' class='text-normal'>
+                                <i class='fa fa-tint text-normal'></i> <span>Тяжелый остаток</span>
+                                <i class="fa fa-angle-right pull-right"></i> </a>
+                            <ul class="treeview-menu">
+                                <li data-id='105' class=''>
+                                    <a href='/admin/heavy_residue/monthly'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-tint'></i> <span>Ежемесячный</span>
+                                    </a>
+                                </li>
+                                <li data-id='106' class=''>
+                                    <a href='/admin/heavy_residue/daily' title="/admin/subscribers/detail/MTcxMjE5NA=="
+                                        class='text-normal'>
+                                        <i class='fa fa-tint'></i> <span>Ежедневный</span>
+                                    </a>
+                                </li>
+                                <li data-id='107' class=''>
+                                    <a href='/admin/heavy_residue/report' title="/admin/subscribers/detail/MTcxMjE5NA=="
+                                        class='text-normal'>
+                                        <i class='fa fa-user-md'></i> <span>Отчет</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                        <li data-id='79' class='treeview '>
+                            <a href='#' class='text-normal'>
+                                <i class='fa fa-simplybuilt text-normal'></i> <span>Завод</span>
+                                <i class="fa fa-angle-right pull-right"></i> </a>
+                            <ul class="treeview-menu">
+                                <li data-id='81' class=''>
+                                    <a href='https://egaz.uz/admin/tb_fc_invoices'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-th-list'></i> <span>Накладные</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                        <li data-id='73' class='treeview '>
+                            <a href='#' class='text-normal'>
+                                <i class='fa fa-fire-extinguisher text-normal'></i> <span>ГНС ГТС</span>
+                                <i class="fa fa-angle-right pull-right"></i> </a>
+                            <ul class="treeview-menu">
+                                <li data-id='74' class=''>
+                                    <a href='https://egaz.uz/admin/accepting_history'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-download'></i> <span>Приём баллонов</span>
+                                    </a>
+                                </li>
+                                <li data-id='97' class=''>
+                                    <a href='https://egaz.uz/admin/gg_requests'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-th-list'></i> <span>Заявки Газголдер</span>
+                                    </a>
+                                </li>
+                                <li data-id='77' class=''>
+                                    <a href='https://egaz.uz/admin/gns_request_docs'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-list-alt'></i> <span>Заявки ГНС</span>
+                                    </a>
+                                </li>
+                                <li data-id='82' class=''>
+                                    <a href='https://egaz.uz/admin/tb_fc_invoices_gns'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-th-list'></i> <span>Накладные ГНС</span>
+                                    </a>
+                                </li>
+                                <li data-id='83' class=''>
+                                    <a href='https://egaz.uz/admin/tb_rezervuars'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-home'></i> <span>Резервуары</span>
+                                    </a>
+                                </li>
+                                <li data-id='108' class=''>
+                                    <a href='https://egaz.uz/admin/transit'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-road'></i> <span>Транзит</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                        <li data-id='71' class='treeview '>
+                            <a href='#' class='text-normal'>
+                                <i class='fa fa-user-md text-normal'></i> <span>Абоненты</span>
+                                <i class="fa fa-angle-right pull-right"></i> </a>
+                            <ul class="treeview-menu">
+                                <li data-id='66' class='active'>
+                                    <a href='https://egaz.uz/admin/subscribers'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-user-md'></i> <span>Список абонентов</span>
+                                    </a>
+                                </li>
+                                <li data-id='93' class=''>
+                                    <a href='https://egaz.uz/admin/buyurtmalar'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-shopping-bag'></i> <span>Заказы ГБ</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                        <li data-id='86' class=' '>
+                            <a href='https://egaz.uz/admin/reports' class='text-normal'>
+                                <i class='fa fa-pie-chart text-normal'></i> <span>Отчёты</span>
+                            </a>
+                        </li>
+                        <li data-id='99' class=' '>
+                            <a href='https://egaz.uz/admin/reportmatrix' class='text-normal'>
+                                <i class='fa fa-bar-chart text-normal'></i> <span>Отчеты (new)</span>
+                            </a>
+                        </li>
+                        <li data-id='80' class='treeview '>
+                            <a href='#' class='text-normal'>
+                                <i class='fa fa-wrench text-normal'></i> <span>Тестовый центр</span>
+                                <i class="fa fa-angle-right pull-right"></i> </a>
+                            <ul class="treeview-menu">
+                                <li data-id='69' class=''>
+                                    <a href='https://egaz.uz/admin/ballons_repair_requests'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-cog'></i> <span>Ремонт баллонов</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                        <li data-id='70' class='treeview '>
+                            <a href='#' class='text-normal'>
+                                <i class='fa fa-home text-normal'></i> <span>РАЙГАЗ</span>
+                                <i class="fa fa-angle-right pull-right"></i> </a>
+                            <ul class="treeview-menu">
+                                <li data-id='75' class=''>
+                                    <a href='https://egaz.uz/admin/gas_requests'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-th-list'></i> <span>Заявки</span>
+                                    </a>
+                                </li>
+                                <li data-id='98' class=''>
+                                    <a href='https://egaz.uz/admin/gg_requests'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-th-large'></i> <span>Заявки Газголдеров</span>
+                                    </a>
+                                </li>
+                                <li data-id='65' class=''>
+                                    <a href='https://egaz.uz/admin/balons'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-flask'></i> <span>Баллоны</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                        <li data-id='3' class='treeview '>
+                            <a href='#' class='text-normal'>
+                                <i class='fa fa-th-large text-normal'></i> <span>Справочники</span>
+                                <i class="fa fa-angle-right pull-right"></i> </a>
+                            <ul class="treeview-menu">
+                                <li data-id='18' class=''>
+                                    <a href='https://egaz.uz/admin/vehicles'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-users'></i> <span>Автотранспорты</span>
+                                    </a>
+                                </li>
+                                <li data-id='100' class=''>
+                                    <a href='https://egaz.uz/admin/drivers'
+                                        title="/admin/subscribers/detail/MTcxMjE5NA==" class='text-normal'>
+                                        <i class='fa fa-users'></i> <span>Водители</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                        <li data-id='101' class=' '>
+                            <a href='https://egaz.uz/admin/arizas' class='text-normal'>
+                                <i class='fa fa-sticky-note-o text-normal'></i> <span>Заявлении</span>
+                            </a>
+                        </li>
+
+                    </ul><!-- /.sidebar-menu -->
+
+                </div>
+
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <section class="content-header" style="display: flex; align-items: center">
+                <!--
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modal-default">
+                  Launch Success Modal
+              </button>
+               -->
+            </section>
+            <!-- Main content -->
+            <section id='content_section' class="content">
+                <!-- <div class='callout callout-'></div> -->
+                <script>
+                </script>
+                <!-- Your Page Content Here -->
+                <div class="col-md-12">
+                    <p style="float:right"><a href="https://egaz.uz/admin/subscribers">&nbsp; <i
+                                class="fa fa-times fa-2x text-red"></i>&nbsp;</a></p>
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs pull-left">
+                            <li class="active"><a href="#tab__user_info" data-toggle="tab" aria-expanded="true"
+                                    class="text-blue"><i class="fa fa-info-circle"></i> Информация </a></li>
+                            <li class=" text-info"><a href="#tab_user_address" data-toggle="tab" aria-expanded="true"
+                                    class="text-blue"><i class="fa fa-building-o"></i> Адрес </a></li>
+                            <li class=" text-info"><a href="#tab_user_contract" data-toggle="tab" aria-expanded="true"
+                                    class="text-blue"><i class="fa fa-table"></i> Контракт </a></li>
+                            <li class=" text-info"><a href="#tab__user_audit" data-toggle="tab" aria-expanded="true"
+                                    class="text-blue"><i class="fa fa-history"></i> Аудит </a></li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab__user_info">
+                            <p>&nbsp;</p>
+                            <table id="table-details" class="dataTable row-border"
+                                style="margin-left: 5px;margin-right:20px">
+                                <tbody>
+                                    <tr>
+                                        <td>ID</td>
+                                        <td><span class="label label-primary">1712194 </span>&nbsp; </td>
+                                    </tr>
+                                    <tr>
+                                        <td>КОД</td>
+                                        <td class="text-uppercase text-black " style="font-weight:600;">
+                                            <?xml version="1.0" standalone="no"?>
+                                            <!DOCTYPE svg
+                                                PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+                                            <svg width="272" height="56" version="1.1"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <g id="bars" fill="black" stroke="none">
+                                                    <rect x="0" y="0" width="2" height="44" />
+                                                    <rect x="4" y="0" width="2" height="44" />
+                                                    <rect x="8" y="0" width="8" height="44" />
+                                                    <rect x="18" y="0" width="2" height="44" />
+                                                    <rect x="26" y="0" width="2" height="44" />
+                                                    <rect x="30" y="0" width="2" height="44" />
+                                                    <rect x="36" y="0" width="2" height="44" />
+                                                    <rect x="40" y="0" width="2" height="44" />
+                                                    <rect x="46" y="0" width="2" height="44" />
+                                                    <rect x="54" y="0" width="2" height="44" />
+                                                    <rect x="62" y="0" width="2" height="44" />
+                                                    <rect x="66" y="0" width="2" height="44" />
+                                                    <rect x="72" y="0" width="2" height="44" />
+                                                    <rect x="80" y="0" width="2" height="44" />
+                                                    <rect x="84" y="0" width="2" height="44" />
+                                                    <rect x="90" y="0" width="2" height="44" />
+                                                    <rect x="98" y="0" width="2" height="44" />
+                                                    <rect x="102" y="0" width="2" height="44" />
+                                                    <rect x="108" y="0" width="2" height="44" />
+                                                    <rect x="116" y="0" width="2" height="44" />
+                                                    <rect x="120" y="0" width="2" height="44" />
+                                                    <rect x="126" y="0" width="2" height="44" />
+                                                    <rect x="134" y="0" width="2" height="44" />
+                                                    <rect x="140" y="0" width="2" height="44" />
+                                                    <rect x="144" y="0" width="2" height="44" />
+                                                    <rect x="150" y="0" width="2" height="44" />
+                                                    <rect x="154" y="0" width="2" height="44" />
+                                                    <rect x="162" y="0" width="2" height="44" />
+                                                    <rect x="172" y="0" width="2" height="44" />
+                                                    <rect x="176" y="0" width="2" height="44" />
+                                                    <rect x="180" y="0" width="2" height="44" />
+                                                    <rect x="186" y="0" width="2" height="44" />
+                                                    <rect x="190" y="0" width="2" height="44" />
+                                                    <rect x="198" y="0" width="2" height="44" />
+                                                    <rect x="204" y="0" width="2" height="44" />
+                                                    <rect x="208" y="0" width="2" height="44" />
+                                                    <rect x="216" y="0" width="4" height="44" />
+                                                    <rect x="222" y="0" width="2" height="44" />
+                                                    <rect x="228" y="0" width="2" height="44" />
+                                                    <rect x="234" y="0" width="2" height="44" />
+                                                    <rect x="240" y="0" width="2" height="44" />
+                                                    <rect x="246" y="0" width="2" height="44" />
+                                                    <rect x="252" y="0" width="2" height="44" />
+                                                    <rect x="256" y="0" width="2" height="44" />
+                                                    <rect x="260" y="0" width="8" height="44" />
+                                                    <rect x="270" y="0" width="2" height="44" />
+                                                    <text x="136" text-anchor="middle" y="56" id="code" fill="black"
+                                                        font-size="12px">01000084944</text>
+                                                </g>
+                                            </svg>
+                                            <br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ф.И.О</td>
+                                        <td class="text-uppercase text-black " style="font-weight:600;">Нишонов
+                                            Убайдулло Мамирович</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ФОТО</td>
+                                        <td><a href="https://egaz.uz/uploads/abonent_photos/68a9b4af9b84c.jpg"
+                                                data-lightbox="cuser_photo"
+                                                data-title="Пользователь: Нишонов Убайдулло Мамирович">
+                                                <img src="https://egaz.uz/uploads/abonent_photos/68a9b4af9b84c.jpg"
+                                                    class="img-circle" alt="" style="width:45px;height:45px">&nbsp;</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ОРГАНИЗАЦИЯ</td>
+                                        <td class="text-uppercase text-black " style="font-weight:600;">Асака туман ГАЗ
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>EMAIL</td>
+                                        <td><span class="text-black">01000084944@egaz.uz</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>РОЛЬ</td>
+                                        <td><span class="text-uppercase text-black"
+                                                style="font-weight:600;">Абонент</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>ПОЛ</td>
+                                        <td>Мужчина</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ТЕЛЕФОН</td>
+                                        <td>902105644</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ДАТА РОЖДЕНИЯ</td>
+                                        <td>09.06.1983 / <i>42 лет.</i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>ПАСПОРТ СЕРИЯ</td>
+                                        <td class="text-uppercase"><b>CL1820098</b> </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ЛИЦО</td>
+                                        <td class="text-uppercase"><b>ФИЗИЧ.</b> </td>
+                                    </tr>
+                                </tbody>
+                                <tr>
+                                    <td>СОЗДАНО:</td>
+                                    <td>23.07.2020 20:57:46</td>
+                                </tr>
+                                <tr>
+                                    <td>ПОСЛЕДНИЙ ВХОД:</td>
+                                    <td>01.01.1970 06:00:00</td>
+                                </tr>
+                                <tr>
+                                    <td>СТАТУС</td>
+                                    <td>
+                                        <span class='badge bg-green'> АКТИВНЫЙ </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ДЕПОЗИТ</td>
+                                    <td>
+                                        <span class="badge bg-gray text-bold">&nbsp;0.00 СУМ</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="tab_user_address">
+                            <p>&nbsp;</p>
+                            <table id="table-detail2" class="dataTable row-border"
+                                style="margin-left: 5px;margin-right:20px">
+                                <tbody>
+                                    <tr>
+                                        <td>РЕГИОН: </td>
+                                        <td><span class="text-uppercase">Андижанская обл.</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>РАЙОН: </td>
+                                        <td><span class="text-uppercase">АСАКА ШАХРИ</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>АДРЕС: </td>
+                                        <td><span class="text-black"><i>Турон</i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>МАХАЛЛЯ: </td>
+                                        <td><span class="text-black"><i></i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>КАДАСТР.№</td>
+                                        <td><span class="text-black"><i>17:02:01:01:01:0099 </i></span></td>
+                                    </tr>
+                                <tfoot>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="tab_user_contract">
+                            <p>&nbsp;</p>
+                            <table id="table-detail_hist" class="dataTable row-border"
+                                style="margin-left: 5px;margin-right:20px">
+                                <tbody>
+                                    <tr>
+                                        <td width="34%">КОНТРАКТ.№</td>
+                                        <td><span class="text-uppercase label label-primary">84944</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>ДАТА КОНТРАКТА</td>
+                                        <td><span class="text-uppercase">18.10.2020</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>ТИП ЖИЛЬЯ</td>
+                                        <td><span class="text-black">
+                                                Земельный участок </span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>КОЛ-ВО СЕМЕЙ</td>
+                                        <td><span class="text-black"><i>3</i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>КОЛ-ВО ПРОЖИВАЮЩИХ</td>
+                                        <td><span class="text-black"><i>5</i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>ЗАПОЛНИЛ: </td>
+                                        <td><span class="text-uppercase">MANNOPOV BEKZOD OZODBEK OʼGʼLI</span></td>
+                                    </tr>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="tab__user_audit">
+                            <p>&nbsp;</p>
+                            <table class="dataTable row-border" style="margin-left: 5px;margin-right:20px">
+                                <thead>
+                                    <tr>
+                                        <th>ID: </th>
+                                        <th>Дата изменения: </th>
+                                        <th>Кто внес изменения:</th>
+                                        <th>Описания изменений: </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>130223509</td>
+                                        <td>25.11.2025 20:35:57</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>125413222</td>
+                                        <td>30.09.2025 19:14:37</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>121958054</td>
+                                        <td>23.08.2025 16:05:57</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>118519200</td>
+                                        <td>16.07.2025 13:30:40</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>114380805</td>
+                                        <td>28.05.2025 09:58:08</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>110071401</td>
+                                        <td>02.04.2025 14:50:03</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>106970887</td>
+                                        <td>25.02.2025 20:17:40</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>103657334</td>
+                                        <td>22.01.2025 10:51:36</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>100541862</td>
+                                        <td>19.12.2024 13:26:12</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>97296520</td>
+                                        <td>15.11.2024 12:44:43</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>93574062</td>
+                                        <td>28.09.2024 09:37:35</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>91127353</td>
+                                        <td>28.08.2024 17:54:41</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>88243702</td>
+                                        <td>23.07.2024 09:12:06</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>85526291</td>
+                                        <td>19.06.2024 17:29:26</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>82101365</td>
+                                        <td>08.05.2024 09:41:07</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>79376236</td>
+                                        <td>05.04.2024 11:35:13</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>76369182</td>
+                                        <td>02.03.2024 15:40:31</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>73575789</td>
+                                        <td>31.01.2024 14:40:16</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>70757191</td>
+                                        <td>30.12.2023 07:15:47</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>67765908</td>
+                                        <td>28.11.2023 15:07:45</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>65183957</td>
+                                        <td>28.10.2023 14:50:18</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>62157995</td>
+                                        <td>23.09.2023 14:17:05</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>59570055</td>
+                                        <td>23.08.2023 14:16:12</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>53456455</td>
+                                        <td>07.06.2023 12:59:51</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>50361801</td>
+                                        <td>28.04.2023 09:32:07</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>47196740</td>
+                                        <td>22.03.2023 16:45:46</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>43777545</td>
+                                        <td>10.02.2023 20:52:41</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>40576228</td>
+                                        <td>06.01.2023 11:11:40</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>35999424</td>
+                                        <td>12.11.2022 11:17:42</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>32226161</td>
+                                        <td>27.09.2022 08:25:08</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>29561016</td>
+                                        <td>24.08.2022 20:05:37</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>26981965</td>
+                                        <td>25.07.2022 10:07:12</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>22458943</td>
+                                        <td>26.05.2022 21:50:30</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>19788978</td>
+                                        <td>21.04.2022 15:29:05</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>17019443</td>
+                                        <td>16.03.2022 22:12:54</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>14644779</td>
+                                        <td>16.02.2022 11:28:40</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>11891097</td>
+                                        <td>12.01.2022 15:15:18</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>9747306</td>
+                                        <td>14.12.2021 15:58:52</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>7117288</td>
+                                        <td>09.11.2021 20:39:20</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>4892373</td>
+                                        <td>10.10.2021 10:10:15</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2725495</td>
+                                        <td>08.09.2021 14:04:06</td>
+                                        <td class="text-uppercase"><b>: </b><br>
+                                            <span class="text-muted text-uppercase"></span>
+                                        </td>
+                                        <td style="font-weight: 500; color:blue; letter-spacing: 1px">
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer" style="background: #F5F5F5">
+                </div>
+                <script>
+                </script>
+            </section><!-- /.content -->
+        </div><!-- /.content-wrapper -->
+        <!-- Footer -->
+        <footer class="main-footer">
+            <!-- To the right -->
+            <div class="pull-right hidden-xs">
+                ver. 1.0.0
+            </div>
+            <!-- Default to the left -->
+            <strong> &copy; Kabus Web Solutions 2025. All Rights Reserved.</strong>
+        </footer>
+    </div><!-- ./wrapper -->
+    <div id='googlemaps-modal-show' class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class='fa fa-search'></i> View Map</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="map" id='map-show'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--[if lt IE 9]>
+    <script src="https://egaz.uz/extra/html5shiv.js"></script>
+    <script src="https://egaz.uz/extra/respond.min.js"></script>
+    <![endif]-->
+    <!-- REQUIRED JS SCRIPTS -->
+    <!-- jQuery 2.1.3 -->
+    <script src="https://egaz.uz/vendor/crudbooster/assets/adminlte/plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <!-- Bootstrap 3.3.2 JS -->
+    <script src="https://egaz.uz/vendor/crudbooster/assets/adminlte/bootstrap/js/bootstrap.min.js"
+        type="text/javascript"></script>
+    <!-- AdminLTE App -->
+    <script src="https://egaz.uz/vendor/crudbooster/assets/adminlte/dist/js/app.js" type="text/javascript"></script>
+    <!--BOOTSTRAP DATEPICKER-->
+    <script
+        src="https://egaz.uz/vendor/crudbooster/assets/adminlte/plugins/datepicker/bootstrap-datepicker.js"></script>
+    <link rel="stylesheet" href="https://egaz.uz/vendor/crudbooster/assets/adminlte/plugins/datepicker/datepicker3.css">
+    <!--BOOTSTRAP DATERANGEPICKER-->
+    <script src="https://egaz.uz/vendor/crudbooster/assets/adminlte/plugins/daterangepicker/moment.min.js"></script>
+    <script
+        src="https://egaz.uz/vendor/crudbooster/assets/adminlte/plugins/daterangepicker/daterangepicker.js"></script>
+    <link rel="stylesheet"
+        href="https://egaz.uz/vendor/crudbooster/assets/adminlte/plugins/daterangepicker/daterangepicker-bs3.css">
+    <!-- Bootstrap time Picker -->
+    <link rel="stylesheet"
+        href="https://egaz.uz/vendor/crudbooster/assets/adminlte/plugins/timepicker/bootstrap-timepicker.min.css">
+    <script
+        src="https://egaz.uz/vendor/crudbooster/assets/adminlte/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+    <link rel='stylesheet' href='https://egaz.uz/vendor/crudbooster/assets/lightbox/dist/css/lightbox.css' />
+    <script src="https://egaz.uz/vendor/crudbooster/assets/lightbox/dist/js/lightbox.min.js"></script>
+    <!--SWEET ALERT-->
+    <script src="https://egaz.uz/vendor/crudbooster/assets/sweetalert/dist/sweetalert.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://egaz.uz/vendor/crudbooster/assets/sweetalert/dist/sweetalert.css">
+    <!--MONEY FORMAT-->
+    <script src="https://egaz.uz/vendor/crudbooster/jquery.price_format.2.0.min.js"></script>
+    <!--DATATABLE-->
+    <link rel="stylesheet" type="text/css" href="https://egaz.uz/extra/datatables.min.css" />
+    <link rel="stylesheet" href="https://egaz.uz/extra/odometer-theme-default.css" />
+    <!--<script type="text/javascript" src="https://egaz.uz/extra/pdfmake.min.js"></script> -->
+    <script type="text/javascript" src="https://egaz.uz/extra/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://egaz.uz/extra/datatables.min.js"></script>
+    <script src="https://egaz.uz/extra/dataTables.searchHighlight.min.js"></script>
+    <script src="https://egaz.uz/extra/jquery.highlight.js"></script>
+
+    <script type="text/javascript" src="https://egaz.uz/extra/dataTables.checkboxes.min.js"></script>
+    <script>
+        var ASSET_URL = "https://egaz.uz/";
+        var APP_NAME = "E-GAZ Billing";
+        var ADMIN_PATH = 'https://egaz.uz/admin';
+        var NOTIFICATION_JSON = "https://egaz.uz/admin/notifications/latest-json";
+        var NOTIFICATION_INDEX = "https://egaz.uz/admin/notifications";
+        var NOTIFICATION_YOU_HAVE = "У Вас есть";
+        var NOTIFICATION_NOTIFICATIONS = "уведомлений";
+        var NOTIFICATION_NEW = "У Вас есть новое сообщение!";
+        $(function () {
+            $('.datatables-simple').DataTable();
+        })
+    </script>
+    <script src="https://egaz.uz/vendor/crudbooster/assets/js/main.js?r=1764144460"></script>
+    <script src="https://egaz.uz/extra/jqcon.min.js"></script>
+    <script src="https://egaz.uz/extra/odometer.min.js"></script>
+
+    <script type="text/javascript">
+        jQuery.browser = {};
+        (function () {
+            jQuery.browser.msie = false;
+            jQuery.browser.version = 0;
+            if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+                jQuery.browser.msie = true;
+                jQuery.browser.version = RegExp.$1;
+            }
+        })();
+        iziToast.settings({
+            timeout: 12900,
+            closeOnEscape: true,
+            close: true,
+            progressBar: true,
+            progressBarEasing: 'ease',
+            pauseOnHover: true,
+            zindex: 9999,
+            maxWidth: 480,
+            rtl: false,
+            layout: 1,
+            // resetOnHover: true,
+            //imageWidth: 50,
+            balloon: true,
+            // target: '.target',
+            icon: 'fa fa-info-circle',
+            // iconText: 'face',
+            animateInside: true,
+            transitionIn: 'flipInX',
+            transitionOut: 'fadeOutLeft',
+            titleSize: 13,
+            // titleLineHeight: 20,
+            messageSize: 12,
+            messageLineHeight: 18,
+        });
+    </script>
+    <script type="text/javascript" src="/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+    <!-- load js -->
+    <script type="text/javascript">
+        var site_url = "https://egaz.uz";
+        function importSubs(e) { e.preventDefault(); var url = "url:https://egaz.uz/admin/subscribers/import-subs"; jc = $.alert({ icon: "fa fa-upload", animation: "rotate", title: "&nbsp; Импорт данных", type: "blue", buttons: [], content: url, closeIcon: true, columnClass: "large", }); }
+        function importAvaiGB(e) { e.preventDefault(); var url = "url:https://egaz.uz/admin/subscribers/import-avaigb"; jc = $.alert({ icon: "fa fa-upload", animation: "rotate", title: "&nbsp; Импорт допустимых ГБ абонентов", type: "blue", buttons: [], content: url, closeIcon: true, columnClass: "large", }); }
+        function deactSubs(e) { e.preventDefault(); var url = "url:https://egaz.uz/admin/subscribers/deact-subs"; jc = $.alert({ icon: "fa fa-upload", animation: "rotate", title: "&nbsp; Блокировка абонентов", type: "blue", buttons: [], content: url, closeIcon: true, columnClass: "large", }); }
+        function activeSubs(e) { e.preventDefault(); var url = "url:https://egaz.uz/admin/subscribers/active-subs"; jc = $.alert({ icon: "fa fa-upload", animation: "rotate", title: "&nbsp; Активация абонентов", type: "blue", buttons: [], content: url, closeIcon: true, columnClass: "large", }); }
+        function updateMahallas(e) { e.preventDefault(); var url = "url:https://egaz.uz/admin/subscribers/import-mahallas"; jc = $.alert({ icon: "fa fa-upload", animation: "rotate", title: "&nbsp; Обновление махаллей", type: "red", buttons: [], content: url, closeIcon: true, columnClass: "large", }); }
+        function checkSubs(e) {
+            e.preventDefault(); jc = $.confirm({
+                title: "Проверить коды абонентов", columnClass: "medium", type: "orange", content: `<br><form name="bl-form" id="bl-form" method="POST" enctype="multipart/form-data"><div class="row col-md-12"><input type="hidden" name="_token" value="XAvcc6BHNa5rnmOgTKN3DGLVcbXinYxK9PT42IdA"/>
+            <div class="form-group col-md-4"> ФАЙЛ АБОНЕНТОВ: </div><div class="form-group col-md-8"><input name="import_file" id="import_file" value="" type="file" required class="form-control" accept=".xls, .xlsx"/></div></div></form><br>`,
+                buttons: {
+                    formSubmit: {
+                        text: " ПРОВЕРИТЬ ", btnClass: "btn-orange", action: function () {
+                            if (!$("input[name=import_file]").val()) { $.alert({ title: "Не указан файл абонентов!", content: "Укажите файл абонентов в формате MS-EXCEL!", type: "red" }); return false; }
+                            var f = $("#bl-form")[0]; var formData = new FormData(f);
+                            $.ajax({
+                                url: "subscribers/check-subs", type: "POST", processData: false, contentType: false,
+                                data: formData, success: function (data) {
+                                    if (data.status == "success") {
+                                        if (data.subs) {
+                                            var qty = data.subs.length; var content = ""; content += "KOD" + "\tID\n"; for (var i = 0; i < qty; i++) {
+                                                content += data.subs[i].kod + "\t" + data.subs[i].id + "\n";
+                                            } var uri = "data:application/octet-stream," + encodeURIComponent(content);
+                                            var filename = "subs_status.txt"; location.href = uri; jc.close(); return false;
+                                        }
+                                    } swal({ title: "Внутренная ошибка сервера!", text: "Возникла техничеcкая ошибка на стороне сервера!", type: "error", html: true, showCancelButton: false, confirmButtonText: " OK ", closeOnConfirm: true }); jc.close();
+                                }, error: function () { jc.close(); swal({ title: "Внутренная ошибка сервера!", text: "Возникла техниcчекая ошибка на стороне сервера!", type: "error", html: true, showCancelButton: false, confirmButtonText: " OK ", closeOnConfirm: true }); }
+                            });
+                        },
+                    }, cancelBtn: { text: " ОТМЕНА ", btnClass: "btn-gray" }
+                }
+            });
+        }
+
+    </script>
+
+</body>
+<script>
+    var JC_DETAIL = null;
+    function getDetail(url, sz = 'large', tp = 'blue', title = 'Детальная информация') {
+        JC_DETAIL = $.alert({
+            title: title,
+            content: 'url:' + url,
+            type: tp,
+            typeAnimated: true,
+            columnClass: sz,
+            closeIcon: true
+        });
+    }
+    function getDetailE(e, url, sz = 'large', tp = 'blue', title = 'Детальная информация') {
+        e.preventDefault();
+        $.alert({
+            title: title,
+            content: 'url:' + url,
+            type: tp,
+            typeAnimated: true,
+            columnClass: sz,
+            closeIcon: true
+        });
+    }
+    function showCoordinate(e, lonn, latt, sz = 'large', tp = 'blue', title = 'Детальная информация') {
+        e.preventDefault();
+        var maps = [];
+        $.alert({
+            title: title,
+            content: 'url:' + url,
+            type: tp,
+            typeAnimated: true,
+            columnClass: sz,
+            closeIcon: true
+        });
+    }
+</script>
+
+</html>

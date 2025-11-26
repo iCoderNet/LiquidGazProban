@@ -207,7 +207,7 @@ class EGazBot:
             if h1_titles:
                 for h1 in h1_titles:
                     ind += 1
-                    text = h1.text.strip()
+                    text = h1.text
                     
                     if text == 'ФОТО':
                         try:

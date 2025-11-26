@@ -307,7 +307,7 @@ class SellWindow:
         
         global Ebot
         Ebot = self.EGazBot
-        track = func.generate_path(float(start_lat), float(start_lon), float(stop_lat), float(stop_lon), 120)
+        track = func.generate_path(float(start_lat), float(start_lon), float(stop_lat), float(stop_lon), len(numbers_list))
         
         success_count = 0
         skipped_count = 0
@@ -407,7 +407,7 @@ class SellWindow:
                 rasm_url='rasm.jpg'
                 if st['photo'] != "":
                     logger.info(f"🔄 Rasm yuklanmoqda: {st['photo']}")
-                    photo_url = func.download_pic(st['photo'], st['ps'])
+                    photo_url = func.get_pic_url(st['photo'], st['ps'])
                     if photo_url is None:
                         logger.error(f"❌ Rasm yuklanmadi: ")
                     else:
@@ -431,6 +431,8 @@ class SellWindow:
                     
                     try:
                         logger.debug(f"API so'rov yuborilmoqda: Abonent={num}, Balon={current_balloon}, GPS=({lat}, {long})")
+                        logger.debug(f"JSHSHIR: {st['jshshir']}")
+                        print(st['jshshir'])
                         
                         result = self.Eapi.submit_ballon_request(
                             oper='realization',
@@ -440,8 +442,8 @@ class SellWindow:
                             id_request=self.reqid,
                             ballon_kod=current_balloon,
                             location_lon=long,
-                            location_lat=lat,
-                            abon_pinfl=st.get('jshshir', ''),
+                            location_lat=lat, 
+                            abon_pinfl=st['jshshir'],
                             photo_path=rasm_url
                         )
 
