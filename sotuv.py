@@ -595,6 +595,20 @@ class SellWindow:
                             logger.warning(f"⚠️ Balon topilmadi: {current_balloon} - Olib tashlanmoqda")
                             available_balloons.remove(current_balloon)
                             time.sleep(0.2)
+
+                        elif "Реализация запрещена! Вы можете осуществить реализацию баллонов только с 06:00 до 21:00!" in api_message:
+                            logger.warning(f"⚠️ Baza yopildi, Sotish vaqt cheklovi: {api_message}")
+                            update_status("⏭️ Baza yopildi, Sotish vaqt cheklovi - o'tkazildi", "#f39c12")
+                            update_bg("#fff8e1")
+                            skipped_count += 1
+                            break # while'dan chiqish
+
+                        elif "уже получал" in api_message and "Реализация баллона запрещено!" in api_message:
+                            # Abonent so'nggi 29 kun ichida balon olgan
+                            logger.warning(f"⚠️ API xatosi: {api_message} - Balon: {current_balloon}")
+                            update_status("⏭️ Abonent yaqinda balon olgan - o'tkazildi", "#f39c12")
+                            skipped_count += 1
+                            break # while'dan chiqish
                             
                         elif api_message == "Реализация запрещена! Не существует абонент с таким кодом!":
                             # User topilmadi - bu userni skip qilish
@@ -602,7 +616,7 @@ class SellWindow:
                             update_status("⏭️ Abonent tizimda topilmadi - o'tkazildi", "#f39c12")
                             update_bg("#fff8e1")
                             skipped_count += 1
-                            break  # while'den chiqish
+                            break  # while'dan chiqish
                             
                         else:
                             # Boshqa xatolik - balonni olib tashlash va davom etish
